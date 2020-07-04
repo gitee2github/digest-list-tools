@@ -1,4 +1,5 @@
-bin_PROGRAMS=upload_digest_lists gen_digest_lists verify_digest_lists
+bin_PROGRAMS=upload_digest_lists gen_digest_lists verify_digest_lists \
+	     write_rpm_pgp_sig
 
 upload_digest_lists_CFLAGS=-I$(top_srcdir)/include
 upload_digest_lists_LDFLAGS=$(top_srcdir)/lib/libdigestlist-base.la
@@ -11,3 +12,7 @@ gen_digest_lists_SOURCES=gen_digest_lists.c
 verify_digest_lists_CFLAGS=-I$(top_srcdir)/include
 verify_digest_lists_LDFLAGS=$(top_srcdir)/lib/libdigestlist-base.la
 verify_digest_lists_SOURCES=verify_digest_lists.c
+
+write_rpm_pgp_sig_CFLAGS=-I$(top_srcdir)/include
+write_rpm_pgp_sig_LDFLAGS=$(top_srcdir)/lib/libdigestlist-base.la
+write_rpm_pgp_sig_SOURCES=write_rpm_pgp_sig.c
