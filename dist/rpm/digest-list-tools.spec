@@ -58,6 +58,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/upload_digest_lists
 %{_bindir}/verify_digest_lists
 %{_bindir}/write_rpm_pgp_sig
+%{_libexecdir}/rpm_parser
 %{_libdir}/libdigestlist-base.so
 %dir %{_libdir}/digestlist
 %{_libdir}/digestlist/libgenerator-compact.so
