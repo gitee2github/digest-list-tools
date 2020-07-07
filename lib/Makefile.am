@@ -3,7 +3,7 @@ lib_LTLIBRARIES=libdigestlist-base.la
 libdigestlist_base_la_LDFLAGS=-no-undefined -avoid-version -rpath /dev/null
 libdigestlist_base_la_LIBADD=-ldl -lcrypto -lselinux -lcap
 libdigestlist_base_la_SOURCES=kernel_lib.c lib.c compact_list.c xattr.c evm.c \
-			      selinux.c parser_lib.c crypto.c cap.c ima_list.c
+			      selinux.c parser_lib.c crypto.c cap.c ima_list.c pgp.c
 libdigestlist_base_la_CFLAGS=-I$(top_srcdir)/include -Werror
 
 if CMOCKA
