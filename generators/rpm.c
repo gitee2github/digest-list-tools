@@ -31,6 +31,7 @@
 #include "xattr.h"
 #include "evm.h"
 #include "cap.h"
+#include "pgp.h"
 
 #define FORMAT "rpm"
 
@@ -364,6 +365,40 @@ out:
 	return ret;
 }
 
+static int write_rpm_header_signature(Header rpm, int dirfd, char *filename)
+{
+	rpmtd signature = rpmtdNew();
+	u8 *data = NULL, *sig = NULL, *issuer = NULL;
+	size_t data_len, sig_len;
+	u16 algo;
+	int ret, fd;
+
+	headerGet(rpm, RPMTAG_RSAHEADER, signature, 0);
+	ret = pgp_get_signature_data(signature->data, signature->count, &data,
+				     &data_len, &sig, &sig_len, &issuer, &algo);
+	rpmtdFree(signature);
+
+	if (ret < 0)
+		return ret;
+
+	write_ima_xattr(dirfd, filename, issuer, sizeof(uint32_t), sig, sig_len,
+			pgp_algo_mapping[algo]);
+
+	fd = openat(dirfd, filename, O_WRONLY | O_APPEND, 0644);
+	if (fd < 0) {
+		ret = -EACCES;
+		goto out;
+	}
+
+	ret = write_check(fd, data, data_len);
+	close(fd);
+out:
+	free(data);
+	free(sig);
+	free(issuer);
+	return ret;
+}
+
 static int find_file(struct list_head *head, char *filename)
 {
 	struct path_struct *cur;
@@ -500,9 +535,19 @@ int db_generator(int dirfd, int pos, struct list_head *head_in,
 				       include_ima_digests, include_lsm_label,
 				       only_executables, include_path,
 				       set_ima_xattr, set_evm_xattr, alt_root);
-		else
+		else {
 			ret = gen_rpm_digest_list(hdr, dirfd, filename,
 						  head_out);
+			if (ret < 0)
+				break;
+
+			ret = write_rpm_header_signature(hdr, dirfd, filename);
+			if (ret < 0) {
+				printf("Warning: signature not found in %s\n",
+				       filename);
+				ret = 0;
+			}
+		}
 
 		if (ret < 0 && ret != -ENODATA) {
 			printf("Cannot generate %s digest list\n", filename);
@@ -582,10 +627,20 @@ static int _pkg_generator(int dirfd, int pos, char *path,
 				include_ima_digests, include_lsm_label,
 				only_executables, include_path, set_ima_xattr,
 				set_evm_xattr, alt_root);
-	else
+	else {
 		ret = gen_rpm_digest_list(hdr, dirfd, filename, head_out);
-	if (ret < 0 && ret != -ENODATA)
-		printf("Cannot generate %s digest list\n", filename);
+		if (ret < 0 && ret != -ENODATA) {
+			printf("Cannot generate %s digest list\n", filename);
+			goto out_fd;
+		}
+
+		ret = write_rpm_header_signature(hdr, dirfd, filename);
+		if (ret < 0) {
+			printf("Warning: signature not found in %s\n",
+				filename);
+			ret = 0;
+		}
+	}
 out_fd:
 	Fclose(fd);
 out_ts:
