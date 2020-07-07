@@ -29,23 +29,23 @@ static void test_gen(void **state)
 	if (fork() == 0) {
 		execlp("../src/gen_digest_lists", "gen_digest_lists",
 		       "-t", "parser", "-o", "append", "-f", "compact",
-		       "-i", "I:../src/upload_digest_lists", "-d", "test", NULL);
+		       "-i", "I:../src/manage_digest_lists", "-d", "test", NULL);
 	}
 
 	wait(NULL);
 
-	ret = stat("test/0-parser_list-compact-upload_digest_lists", &st);
+	ret = stat("test/0-parser_list-compact-manage_digest_lists", &st);
 	assert_return_code(ret, 0);
 
 	if (fork() == 0) {
 		execlp("../src/gen_digest_lists", "gen_digest_lists",
 		       "-t", "parser", "-o", "add", "-f", "compact", "-p", "0",
-		       "-i", "I:../src/upload_digest_lists", "-d", "test", NULL);
+		       "-i", "I:../src/manage_digest_lists", "-d", "test", NULL);
 	}
 
 	wait(NULL);
 
-	ret = stat("test/1-parser_list-compact-upload_digest_lists", &st);
+	ret = stat("test/1-parser_list-compact-manage_digest_lists", &st);
 	assert_return_code(ret, 0);
 
 	if (fork() == 0) {

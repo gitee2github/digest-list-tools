@@ -8,8 +8,8 @@
  * published by the Free Software Foundation, version 2 of the
  * License.
  *
- * File: upload_digest_lists.c
- *      Parse and upload digest lists
+ * File: manage_digest_lists.c
+ *      Manage and convert digest lists
  */
 
 #define _GNU_SOURCE

@@ -48,9 +48,9 @@ Lists extension:
   Generates digest lists from different sources, e.g. the RPM database, a RPM
   package or a directory;
 
-- upload_digest_lists:
-  Converts digest lists of arbitrary formats to the format supported by the
-  kernel; it can also upload converted digest lists to the kernel;
+- manage_digest_lists:
+  Manages digest lists and converts digest lists of arbitrary formats to the
+  format supported by the kernel;
 
 - verify_digest_lists:
   Verifies the integrity of digest lists;
@@ -62,7 +62,7 @@ Lists extension:
 - setup_ima_digest_list_demo:
   Script with a predefined workflow to create digest lists.
 
-Both upload_digest_lists and gen_digest_lists have a modular design: they can
+Both manage_digest_lists and gen_digest_lists have a modular design: they can
 support additional parsers/generators. Third-party libraries should be placed in
 the $libdir/digestlist directory.
 
@@ -83,11 +83,11 @@ the $libdir/digestlist directory.
     | Base library (I/O, xattr, crypto) | <---- | Signing Key |            |
     +-----------------------------------+       +-------------+            |
                                            (2) provide signing key         |
-                                                             +------+--------------+
-                                                             | Sig  |  Digest list |
-                                                             |      |    (fmt N)   |
-                                                             +------+--------------+
-        upload_digest_lists:                                                   |
+                                                         +------+--------------+
+                                                         | Sig  |  Digest list |
+                                                         |      |    (fmt N)   |
+                                                         +------+--------------+
+    manage_digest_lists:                                                   |
                              (4) parse digest list (fmt N)                 |
     +----------+             +----------+                                  |
     | Parser 1 |     ...     | Parser N | <--------------------------------|
@@ -95,10 +95,10 @@ the $libdir/digestlist directory.
     +-----------------------------------+
     |    Compact list API (generator)   | (5) convert to compact list
     +-----------------------------------+
-    +-----------------------------------+             +--------+
-    |         Base library (I/O)        | ----------> | Kernel |
-    +-----------------------------------+             +--------+
-                                          (6) upload compact list
+    +-----------------------------------+
+    |         Base library (I/O)        |
+    +-----------------------------------+
+
 
 
 
@@ -487,15 +487,6 @@ this command can be obtained by executing the command:
 $ man gen_digest_lists
 ```
 
-#### Upload
-
-After digest lists have been generated, they can be uploaded by executing the
-command:
-
-```
-# upload_digest_lists
-```
-
 ### Integrity Verification
 
 The measurement list, after loading the digest lists, will look like:
@@ -503,7 +494,7 @@ The measurement list, after loading the digest lists, will look like:
 ```
 11 <digest> ima-ng <digest> boot_aggregate
 11 <digest> ima-ng <digest> /etc/keys/x509_ima.der
-11 <digest> ima-ng <digest> [...]/0-parser_list-compact-upload_digest_lists
+11 <digest> ima-ng <digest> [...]/0-parser_list-compact-manage_digest_lists
 11 <digest> ima-ng <digest> [...]/0-key_list-signing_key.der
 11 <digest> ima-ng <digest> [...]/1-parser_list-compact-libparser-ima.so
 11 <digest> ima-ng <digest> [...]/2-parser_list-compact-libparser-rpm.so

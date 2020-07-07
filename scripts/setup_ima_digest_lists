@@ -15,7 +15,7 @@
 
 OPTIND=2
 digest_lists_dir="/etc/ima/digest_lists"
-parser_path="/usr/bin/upload_digest_lists"
+parser_path="/usr/bin/manage_digest_lists"
 gen_digest_lists_result=0
 use_current_ima_list=0
 sign_opt=""
@@ -167,7 +167,7 @@ if [ $no_default_type -eq 1 ]; then
 fi
 
 if [ "$1" = "parser" ] || \
-   [ ! -e $digest_lists_dir/compact-upload_digest_lists ]; then
+   [ ! -e $digest_lists_dir/compact-manage_digest_lists ]; then
     if [ -n "$sign_opts" ]; then
         temp_cert="/tmp/$(basename ${cert%%.pem}.der)"
         openssl x509 -in $cert -out $temp_cert -outform der 2> /dev/null

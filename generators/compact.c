@@ -521,7 +521,7 @@ out_close:
 	if (ret < 0 || unlink) {
 		unlinkat(dirfd, filename, 0);
 	} else if (!gen_list_path) {
-		if (!tlv && !strcmp(basename, "upload_digest_lists")) {
+		if (!tlv && !strcmp(basename, "manage_digest_lists")) {
 			link = strchr(strchr(filename, '-') + 1, '-') + 1;
 			unlinkat(dirfd, link, 0);
 			ret = symlinkat(filename, dirfd, link);

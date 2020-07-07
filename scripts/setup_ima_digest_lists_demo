@@ -69,12 +69,12 @@ if [ "$1" = "initial" ]; then
         $sign_opt
 
     echo "Remove old IMA/EVM/INFOFLOW xattrs..."
-    upload_digest_lists -p rm-ima-xattr
-    upload_digest_lists -p rm-evm-xattr
-    upload_digest_lists -p rm-infoflow-xattr
+    manage_digest_lists -p rm-ima-xattr
+    manage_digest_lists -p rm-evm-xattr
+    manage_digest_lists -p rm-infoflow-xattr
 
     echo "Generate IMA measurements list..."
-    upload_digest_lists -p gen-ima-list -o binary_runtime_measurements
+    manage_digest_lists -p gen-ima-list -o binary_runtime_measurements
 
     if [ -f /usr/bin/attest_ra_client ]; then
         echo "Generate EVM key..."
@@ -86,7 +86,7 @@ if [ "$1" = "initial" ]; then
     dracut -f -e xattr
 
     echo "Add IMA xattr from digest lists..."
-    upload_digest_lists -p add-ima-xattr
+    manage_digest_lists -p add-ima-xattr
 
     echo "Fix SELinux label of digest lists..."
     restorecon -R -F /etc/ima/digest_lists
@@ -94,5 +94,5 @@ if [ "$1" = "initial" ]; then
     echo "Remount / read-only..."
     mount -oremount,ro /
 elif [ "$1" = "final" ]; then
-    upload_digest_lists -p add-evm-xattr
+    manage_digest_lists -p add-evm-xattr
 fi
