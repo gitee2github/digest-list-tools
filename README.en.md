@@ -52,6 +52,10 @@ Lists extension:
   Manages digest lists and converts digest lists of arbitrary formats to the
   format supported by the kernel;
 
+- upload_digest_lists:
+  Runs parsers of digest lists to upload those that are in a format not
+  recognized by the kernel;
+
 - verify_digest_lists:
   Verifies the integrity of digest lists;
 
@@ -91,14 +95,21 @@ the $libdir/digestlist directory.
                              (4) parse digest list (fmt N)                 |
     +----------+             +----------+                                  |
     | Parser 1 |     ...     | Parser N | <--------------------------------|
-    +----------+             +----------+
-    +-----------------------------------+
-    |    Compact list API (generator)   | (5) convert to compact list
-    +-----------------------------------+
-    +-----------------------------------+
-    |         Base library (I/O)        |
-    +-----------------------------------+
-
+    +----------+             +----------+                                  |
+    +-----------------------------------+                                  |
+    |    Compact list API (generator)   | (5) convert to compact list      |
+    +-----------------------------------+     and sign                     |
+    +-----------------------------------+       +-------------+            |
+    |         Base library (I/O)        | <---- | Signing Key |            |
+    +-----------------------------------+       +-------------+            |
+                          |                                                |
+                          |                                                |
+                          |                                                |
+    upload_digest_lists:  |                                                |
+                          |      (6) upload digest list          +------------+
+              +-------------+                                    |   Parser   |
+              |    Kernel   | <--------------------------------- |   exec     |
+              +-------------+                                    +------------+
 
 
 

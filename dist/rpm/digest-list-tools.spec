@@ -55,6 +55,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/setup_ima_digest_lists
 %{_bindir}/setup_ima_digest_lists_demo
 %{_bindir}/manage_digest_lists
+%{_bindir}/upload_digest_lists
 %{_bindir}/verify_digest_lists
 %{_bindir}/write_rpm_pgp_sig
 %{_libdir}/libdigestlist-base.so
@@ -84,6 +85,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_datarootdir}/digest-list-tools/setup_ima_digest_lists.txt
 %{_datarootdir}/digest-list-tools/setup_ima_digest_lists_demo.txt
 %{_datarootdir}/digest-list-tools/manage_digest_lists.txt
+%{_datarootdir}/digest-list-tools/upload_digest_lists.txt
 %{_datarootdir}/digest-list-tools/verify_digest_lists.txt
 %{_datarootdir}/digest-list-tools/write_rpm_pgp_sig.txt
 %{_mandir}/man1/gen_digest_lists.1.gz
@@ -91,6 +93,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/setup_ima_digest_lists_demo.1.gz
 %{_mandir}/man1/verify_digest_lists.1.gz
 %{_mandir}/man1/manage_digest_lists.1.gz
+%{_mandir}/man1/upload_digest_lists.1.gz
 %{_mandir}/man1/write_rpm_pgp_sig.1.gz
 %{_mandir}/man1/%{name}.1.gz
 
