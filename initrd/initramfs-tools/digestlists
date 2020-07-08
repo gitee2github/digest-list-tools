@@ -16,7 +16,8 @@ esac
 
 . /usr/share/initramfs-tools/hook-functions
 
-#copy_file binary /usr/bin/upload_digest_lists
+copy_file binary /usr/bin/upload_digest_lists
+copy_file binary /usr/libexec/rpm_parser
 
 for file in $(ls -d /etc/ima/digest_lists/*); do
     copy_file binary $file
