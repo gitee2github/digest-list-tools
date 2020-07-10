@@ -11,11 +11,11 @@ BuildRequires:  autoconf automake libcurl-devel libtool rpm-devel dracut gzip
 BuildRequires:  libcap-devel libcmocka-devel
 
 %if 0%{?suse_version}
-BuildRequires:  libopenssl-devel
+BuildRequires:  libopenssl-devel glibc-devel-static
 BuildRequires:  linux-glibc-devel keyutils-devel
 %else
 BuildRequires:  openssl-devel kernel-headers
-BuildRequires:  keyutils-libs-devel
+BuildRequires:  keyutils-libs-devel glibc-static
 %endif
 
 %description
