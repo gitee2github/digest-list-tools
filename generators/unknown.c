@@ -249,7 +249,7 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 	char filename[NAME_MAX + 1];
 	char path[PATH_MAX];
 	char *digest_lists_dir = NULL, *path_list = NULL, *gen_list_path = NULL;
-	char *data_ptr, *line_ptr;
+	char *data_ptr, *line_ptr, *real_path;
 	void *data;
 	loff_t size;
 	time_t t = time(NULL);
@@ -263,7 +263,7 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 	enum hash_algo list_algo;
 	int include_ima_digests = 0, only_executables = 0, root_cred = 0;
 	int include_path = 0, include_file = 0, set_ima_xattr = 0;
-	int path_list_ext = 0, set_evm_xattr = 0;
+	int path_list_ext = 0, set_evm_xattr = 0, alt_root_len;
 	int fts_flags = (FTS_PHYSICAL | FTS_COMFOLLOW | FTS_NOCHDIR | FTS_XDEV);
 	int ret, i, digest_lists_dirfd, fd, prefix_len, include_lsm_label = 0;
 
@@ -438,6 +438,13 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 		while ((ftsent = fts_read(fts)) != NULL) {
 			switch (ftsent->fts_info) {
 			case FTS_F:
+				real_path = ftsent->fts_path;
+				alt_root_len = alt_root ? strlen(alt_root) : 0;
+
+				if (alt_root &&
+				    alt_root_len < strlen(real_path))
+					real_path += alt_root_len;
+
 				include_file = 0;
 				statp = ftsent->fts_statp;
 				if (path_list_ext) {
@@ -451,7 +458,7 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 						if (cur_i->path[0] != 'F')
 							continue;
 
-						if (!strncmp(ftsent->fts_path,
+						if (!strncmp(real_path,
 						    &cur_i->path[2],
 						    strlen(&cur_i->path[2]))) {
 							include_file = 1;
@@ -475,7 +482,7 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 				list_for_each_entry(cur_e, head_in, list) {
 					if (cur_e->path[0] == 'E' &&
 					    !strncmp(&cur_e->path[2],
-						     ftsent->fts_path,
+						     real_path,
 						     strlen(&cur_e->path[2]))) {
 						include_file = 0;
 						break;

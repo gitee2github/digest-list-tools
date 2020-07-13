@@ -248,7 +248,7 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 {
 	char filename[NAME_MAX + 1], *basename = NULL, *link = NULL;
 	char path[PATH_MAX], *path_list = NULL, *data_ptr, *line_ptr;
-	char *path_ptr = NULL, *gen_list_path = NULL;
+	char *path_ptr = NULL, *gen_list_path = NULL, *real_path;
 	struct list_struct *list = NULL, *list_file = NULL;
 	struct path_struct *cur, *cur_i, *cur_e;
 	LIST_HEAD(list_head);
@@ -266,7 +266,7 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 	int fts_flags = (FTS_PHYSICAL | FTS_COMFOLLOW | FTS_NOCHDIR | FTS_XDEV);
 	int include_ima_digests = 0, only_executables = 0, set_ima_xattr = 0;
 	int ret = 0, fd, prefix_len, include_lsm_label = 0, include_file = 0;
-	int path_list_ext = 0, set_evm_xattr = 0;
+	int path_list_ext = 0, set_evm_xattr = 0, alt_root_len;
 	int use_path_list_filename = 0, root_cred = 0, include_path = 0;
 
 	list_for_each_entry(cur, head_in, list) {
@@ -433,6 +433,13 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 		while ((ftsent = fts_read(fts)) != NULL) {
 			switch (ftsent->fts_info) {
 			case FTS_F:
+				real_path = ftsent->fts_path;
+				alt_root_len = alt_root ? strlen(alt_root) : 0;
+
+				if (alt_root &&
+				    alt_root_len < strlen(real_path))
+					real_path += alt_root_len;
+
 				include_file = 0;
 				statp = ftsent->fts_statp;
 				if (path_list_ext) {
@@ -446,7 +453,7 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 						if (cur_i->path[0] != 'F')
 							continue;
 
-						if (!strncmp(ftsent->fts_path,
+						if (!strncmp(real_path,
 						    &cur_i->path[2],
 						    strlen(&cur_i->path[2]))) {
 							include_file = 1;
@@ -470,7 +477,7 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 				list_for_each_entry(cur_e, head_in, list) {
 					if (cur_e->path[0] == 'E' &&
 					    !strncmp(&cur_e->path[2],
-						     ftsent->fts_path,
+						     real_path,
 						     strlen(&cur_e->path[2]))) {
 						include_file = 0;
 						break;
