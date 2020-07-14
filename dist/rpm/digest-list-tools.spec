@@ -1,5 +1,5 @@
 name:           digest-list-tools
-Version:        0.3.92
+Version:        0.3.93
 Release:        1%{?dist}
 Summary:        Digest list tools
 
@@ -99,11 +99,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{name}.1.gz
 
 %changelog
-* Thu Jul 02 2020 - 0.3.92
+* Thu Jul 02 2020 Roberto Sassu <roberto.sassu@huawei.com> - 0.3.92
 - Bug fixes
 - Change format of file list for compact/unknown generators
 
-* Tue Jun 03 2020 Roberto Sassu <roberto.sassu@huawei.com> - 0.3.91
+* Wed Jun 03 2020 Roberto Sassu <roberto.sassu@huawei.com> - 0.3.91
 - Bug fixes
 
 * Fri Apr 17 2020 Roberto Sassu <roberto.sassu@huawei.com> - 0.3.90
