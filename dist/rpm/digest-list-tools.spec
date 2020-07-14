@@ -1,6 +1,6 @@
 name:           digest-list-tools
 Version:        0.3.93
-Release:        1%{?dist}
+Release:        1
 Summary:        Digest list tools
 
 Source0:        %{name}-%{version}.tar.gz
@@ -99,6 +99,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{name}.1.gz
 
 %changelog
+* Tue Jul 14 2020 Roberto Sassu <roberto.sassu@huawei.com> - 0.3.93
+- Add support for PGP signatures
+- Add support for user space parsers
+- Bug fixes
+
 * Thu Jul 02 2020 Roberto Sassu <roberto.sassu@huawei.com> - 0.3.92
 - Bug fixes
 - Change format of file list for compact/unknown generators
