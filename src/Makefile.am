@@ -21,6 +21,7 @@ upload_digest_lists_CFLAGS=-I$(top_srcdir)/include
 upload_digest_lists_LDFLAGS=-all-static
 upload_digest_lists_SOURCES=upload_digest_lists.c
 
+libexecdir=$(prefix)/libexec
 libexec_PROGRAMS=rpm_parser
 
 rpm_parser_CFLAGS=-I$(top_srcdir)/include
