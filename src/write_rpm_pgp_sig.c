@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	u16 algo;
 	int ret, fd;
 
-	if (argc != 3) {
+	if (argc < 3) {
 		printf("Missing argument\n");
 		return -EINVAL;
 	}
@@ -40,6 +40,15 @@ int main(int argc, char *argv[])
 				     &sig, &sig_len, &issuer, &algo);
 	if (ret < 0)
 		goto out;
+
+	if (argc == 4) {
+		free(sig);
+
+		ret = read_file_from_path(-1, argv[3], (void **)&sig,
+					  (loff_t *)&sig_len);
+		if (ret < 0)
+			goto out;
+	}
 
 	write_ima_xattr(-1, argv[1], issuer, sizeof(uint32_t), sig, sig_len,
 			pgp_algo_mapping[algo]);
@@ -55,6 +64,9 @@ int main(int argc, char *argv[])
 out:
 	munmap(pgp_sig, pgp_sig_len);
 	free(data);
-	free(sig);
+	if (argc == 4)
+		munmap(sig, sig_len);
+	else
+		free(sig);
 	return ret;
 }
