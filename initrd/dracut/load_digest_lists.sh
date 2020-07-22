@@ -4,6 +4,11 @@ if [ ! -f /sys/kernel/security/ima/digest_list_data ]; then
 	exit 0
 fi
 
+digests_count=$(cat /sys/kernel/security/ima/digests_count)
+if [ "$digests_count" = "0" ]; then
+	exit 0
+fi
+
 for f in $(find $NEWROOT/etc/ima/digest_lists -type f); do
 	if [ ! -f /etc/ima/digest_lists/$(basename $f) ]; then
 		process_digest_list=$(getfattr -m - -e hex -d $f \
