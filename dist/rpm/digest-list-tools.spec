@@ -6,7 +6,7 @@ Summary:        Digest list tools
 Source0:        %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 License:        GPL-2.0
-Url:            https://github.com/euleros/digest-list-tools
+Url:            https://gitee.com/openeuler/digest-list-tools
 BuildRequires:  autoconf automake libcurl-devel libtool rpm-devel dracut gzip
 BuildRequires:  libcap-devel libcmocka-devel
 
