@@ -19,18 +19,18 @@ OPTIONS
 -o <file>: write converted digest list to a file
 
 -p <op>: specify parser operation:
-	 add-digest: add IMA digest to output file
-	 add-meta-digest: add EVM digest to output file
-	 add-ima-xattr: set IMA xattr for files in the digest lists
-	 rm-ima-xattr: remove IMA xattr for files in the digest lists
-	 add-evm-xattr: set EVM xattr for files in the digest lists
-	 rm-evm-xattr: remove EVM xattr for files in the digest lists
-	 rm-infoflow-xattr: remove Infoflow xattr for files in the digest lists
-	 dump: display content of digest lists
-	 gen-ima-list: generate IMA digest list with digest list measurement
-	 check-meta: compare metadata between digest lists and filesystem
-	 repair-meta: set metadata from the digest lists to the filesystem
-	 repair-meta-digest-lists: set digest lists metadata
+     add-digest: add IMA digest to output file
+     add-meta-digest: add EVM digest to output file
+     add-ima-xattr: set IMA xattr for files in the digest lists
+     rm-ima-xattr: remove IMA xattr for files in the digest lists
+     add-evm-xattr: set EVM xattr for files in the digest lists
+     rm-evm-xattr: remove EVM xattr for files in the digest lists
+     rm-infoflow-xattr: remove Infoflow xattr for files in the digest lists
+     dump: display content of digest lists
+     gen-ima-list: generate IMA digest list with digest list measurement
+     check-meta: compare metadata between digest lists and filesystem
+     repair-meta: set metadata from the digest lists to the filesystem
+     repair-meta-digest-lists: set digest lists metadata
 
 -v: verbose mode
 
@@ -42,7 +42,7 @@ Convert all digest lists in /etc/ima/digest_lists to the compact format and
 save the converted lists to converted_lists.
 
 # manage_digest_lists -d /etc/ima/digest_lists -p add-digest \
-		      -o converted_lists
+              -o converted_lists
 
 
 AUTHOR

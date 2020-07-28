@@ -31,30 +31,30 @@
  * protection.)
  */
 static int hmac_add_misc(EVP_MD_CTX *mdctx, uid_t uid, gid_t gid, mode_t mode,
-			 u8 *digest)
+             u8 *digest)
 {
-	struct h_misc {
-		unsigned long ino;
-		u32 generation;
-		uid_t uid;
-		gid_t gid;
-		mode_t mode;
-	} hmac_misc;
+    struct h_misc {
+        unsigned long ino;
+        u32 generation;
+        uid_t uid;
+        gid_t gid;
+        mode_t mode;
+    } hmac_misc;
 
-	memset(&hmac_misc, 0, sizeof(hmac_misc));
+    memset(&hmac_misc, 0, sizeof(hmac_misc));
 
-	hmac_misc.uid = uid;
-	hmac_misc.gid = gid;
-	hmac_misc.mode = mode;
+    hmac_misc.uid = uid;
+    hmac_misc.gid = gid;
+    hmac_misc.mode = mode;
 
-	if (EVP_DigestUpdate(mdctx, (const u8 *)&hmac_misc,
-			     sizeof(hmac_misc)) != 1)
-		return -EINVAL;
+    if (EVP_DigestUpdate(mdctx, (const u8 *)&hmac_misc,
+                 sizeof(hmac_misc)) != 1)
+        return -EINVAL;
 
-	if (EVP_DigestFinal_ex(mdctx, digest, NULL) != 1)
-		return -EINVAL;
+    if (EVP_DigestFinal_ex(mdctx, digest, NULL) != 1)
+        return -EINVAL;
 
-	return 0;
+    return 0;
 }
 
 /*
@@ -65,46 +65,46 @@ static int hmac_add_misc(EVP_MD_CTX *mdctx, uid_t uid, gid_t gid, mode_t mode,
  * each xattr, but attempt to re-use the previously allocated memory.
  */
 int evm_calc_hmac_or_hash(enum hash_algo algo, u8 *digest,
-			  int lsm_label_len, char *lsm_label,
-			  int ima_digest_len, u8 *ima_digest,
-			  int caps_bin_len, u8 *caps_bin,
-			  uid_t uid, gid_t gid, mode_t mode)
+              int lsm_label_len, char *lsm_label,
+              int ima_digest_len, u8 *ima_digest,
+              int caps_bin_len, u8 *caps_bin,
+              uid_t uid, gid_t gid, mode_t mode)
 {
-	EVP_MD_CTX *mdctx;
-	const EVP_MD *md;
-	int ret = -EINVAL;
+    EVP_MD_CTX *mdctx;
+    const EVP_MD *md;
+    int ret = -EINVAL;
 
-	OpenSSL_add_all_algorithms();
+    OpenSSL_add_all_algorithms();
 
-	md = EVP_get_digestbyname(hash_algo_name[algo]);
-	if (!md)
-		goto out;
+    md = EVP_get_digestbyname(hash_algo_name[algo]);
+    if (!md)
+        goto out;
 
-	mdctx = EVP_MD_CTX_create();
-	if (!mdctx)
-		goto out;
+    mdctx = EVP_MD_CTX_create();
+    if (!mdctx)
+        goto out;
 
-	if (EVP_DigestInit_ex(mdctx, md, NULL) != 1)
-		goto out_mdctx;
+    if (EVP_DigestInit_ex(mdctx, md, NULL) != 1)
+        goto out_mdctx;
 
-	if (lsm_label &&
-	    EVP_DigestUpdate(mdctx, (const u8 *)lsm_label, lsm_label_len) != 1)
-		goto out_mdctx;
+    if (lsm_label &&
+        EVP_DigestUpdate(mdctx, (const u8 *)lsm_label, lsm_label_len) != 1)
+        goto out_mdctx;
 
-	if (EVP_DigestUpdate(mdctx, (const u8 *)ima_digest,
-			     ima_digest_len) != 1)
-		goto out_mdctx;
+    if (EVP_DigestUpdate(mdctx, (const u8 *)ima_digest,
+                 ima_digest_len) != 1)
+        goto out_mdctx;
 
-	if (EVP_DigestUpdate(mdctx, caps_bin, caps_bin_len) != 1)
-		goto out_mdctx;
+    if (EVP_DigestUpdate(mdctx, caps_bin, caps_bin_len) != 1)
+        goto out_mdctx;
 
-	if (hmac_add_misc(mdctx, uid, gid, mode, digest) < 0)
-		goto out_mdctx;
+    if (hmac_add_misc(mdctx, uid, gid, mode, digest) < 0)
+        goto out_mdctx;
 
-	ret = 0;
+    ret = 0;
 out_mdctx:
-	EVP_MD_CTX_destroy(mdctx);
+    EVP_MD_CTX_destroy(mdctx);
 out:
-	EVP_cleanup();
-	return ret;
+    EVP_cleanup();
+    return ret;
 }

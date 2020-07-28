@@ -18,35 +18,35 @@
 
 static void test_lib_lookup(void **state)
 {
-	LIST_HEAD(lib_head);
-	struct lib *first_lib, *second_lib, *third_lib;
-	const char parser_str[] = "parser";
-	const char rpm_str[] = "rpm-test";
-	const char rpm_db_str[] = "rpm-test+db";
-	const char ima_ng_str[] = "compact_tlv-test";
+    LIST_HEAD(lib_head);
+    struct lib *first_lib, *second_lib, *third_lib;
+    const char parser_str[] = "parser";
+    const char rpm_str[] = "rpm-test";
+    const char rpm_db_str[] = "rpm-test+db";
+    const char ima_ng_str[] = "compact_tlv-test";
 
-	first_lib = lookup_lib(&lib_head, parser_str, rpm_str,
-			       sizeof(rpm_str) - 1);
-	assert_non_null(first_lib);
-	assert_memory_equal(first_lib->format, rpm_str, sizeof(rpm_str) - 1);
+    first_lib = lookup_lib(&lib_head, parser_str, rpm_str,
+                   sizeof(rpm_str) - 1);
+    assert_non_null(first_lib);
+    assert_memory_equal(first_lib->format, rpm_str, sizeof(rpm_str) - 1);
 
-	second_lib = lookup_lib(&lib_head, parser_str, rpm_db_str,
-				sizeof(rpm_db_str) - 1);
-	assert_non_null(second_lib);
+    second_lib = lookup_lib(&lib_head, parser_str, rpm_db_str,
+                sizeof(rpm_db_str) - 1);
+    assert_non_null(second_lib);
 
-	assert_ptr_equal(first_lib, second_lib);
+    assert_ptr_equal(first_lib, second_lib);
 
-	third_lib = lookup_lib(&lib_head, parser_str, ima_ng_str,
-			       sizeof(ima_ng_str) - 1);
-	assert_non_null(third_lib);
+    third_lib = lookup_lib(&lib_head, parser_str, ima_ng_str,
+                   sizeof(ima_ng_str) - 1);
+    assert_non_null(third_lib);
 
-	free_libs(&lib_head);
+    free_libs(&lib_head);
 }
 
 int main(void) {
-	const struct CMUnitTest tests[] = {
-		cmocka_unit_test(test_lib_lookup),
-	};
+    const struct CMUnitTest tests[] = {
+        cmocka_unit_test(test_lib_lookup),
+    };
 
-	return cmocka_run_group_tests(tests, NULL, NULL);
+    return cmocka_run_group_tests(tests, NULL, NULL);
 }

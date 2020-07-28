@@ -35,19 +35,19 @@
 int calc_digest(u8 *digest, void *data, u64 len, enum hash_algo algo);
 int calc_file_digest(u8 *digest, int dirfd, char *path, enum hash_algo algo);
 int sign_files(int dirfd, struct list_head *head, char *key_path,
-	       char *keypass, enum hash_algo algo);
+           char *keypass, enum hash_algo algo);
 
 struct key_struct {
-	struct list_head list;
-	RSA *key;
-	u8 keyid[4];
+    struct list_head list;
+    RSA *key;
+    u8 keyid[4];
 };
 
 void free_keys(struct list_head *head);
 struct key_struct *new_key(struct list_head *head, int dirfd, char *key_path,
-			   char *keypass, bool private);
+               char *keypass, bool private);
 struct key_struct *lookup_key(struct list_head *head, int dirfd, char *key_path,
-			      u8 *keyid);
+                  u8 *keyid);
 int verify_file(struct list_head *head, int dirfd, char *filename);
 int verify_sig(struct list_head *head, int dirfd, u8 *sig, int sig_len,
                u8 *digest, enum hash_algo algo);

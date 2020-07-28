@@ -23,39 +23,39 @@ static struct selabel_handle *h;
 
 int selinux_init_setup(void)
 {
-	int rc = 0;
+    int rc = 0;
 
-	h = selabel_open(SELABEL_CTX_FILE, NULL, 0);
-	if (!h) {
-		pr_err("Cannot initialize libselinux\n");
-		return -EPERM;
-	}
+    h = selabel_open(SELABEL_CTX_FILE, NULL, 0);
+    if (!h) {
+        pr_err("Cannot initialize libselinux\n");
+        return -EPERM;
+    }
 
-	selinux_restorecon_set_sehandle(h);
+    selinux_restorecon_set_sehandle(h);
 
-	return rc;
+    return rc;
 }
 
 void selinux_end_setup(void)
 {
-	if (h) {
-		selabel_close(h);
-		h = NULL;
-	}
+    if (h) {
+        selabel_close(h);
+        h = NULL;
+    }
 }
 
 int get_selinux_label(char *path, char *alt_root, char **label, mode_t mode)
 {
-	int offset = alt_root ? strlen(alt_root) : 0;
-	int ret;
+    int offset = alt_root ? strlen(alt_root) : 0;
+    int ret;
 
-	if (!h) {
-		ret = selinux_init_setup();
-		if (ret < 0) {
-			*label = NULL;
-			return 0;
-		}
-	}
+    if (!h) {
+        ret = selinux_init_setup();
+        if (ret < 0) {
+            *label = NULL;
+            return 0;
+        }
+    }
 
-	return selabel_lookup_raw(h, label, path + offset, mode);
+    return selabel_lookup_raw(h, label, path + offset, mode);
 }
