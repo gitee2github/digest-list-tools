@@ -1,0 +1,30 @@
+NAME
+write_rpm_pgp_sig - Add security.ima to a file with the RPM header
+
+
+SYNOPSIS
+write_rpm_pgp_sig <RPM header> <PGP signature>
+
+
+DESCRIPTION
+write_rpm_pgp_sig can be used to add security.ima to a file with the RPM
+header.
+
+OPTIONS
+-h: display help
+
+
+EXAMPLES
+Add security.ima:
+
+# write_rpm_pgp_sig rpm-header rpm-header.sig
+
+
+AUTHOR
+Written by Roberto Sassu, <roberto.sassu at huawei.com>.
+
+
+COPYING
+Copyright (C) 2020 Huawei Technologies Duesseldorf GmbH. Free use of
+this software is granted under the terms of the GNU Public License 2.0
+(GPLv2).

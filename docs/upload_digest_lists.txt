@@ -1,0 +1,27 @@
+NAME
+upload_digest_lists - run digest list parsers
+
+
+SYNOPSIS
+upload_digest_lists add|del <digest list path>
+
+
+DESCRIPTION
+upload_digest_lists runs parsers of digest lists to upload those that are
+in a format not recognized by the kernel.
+
+
+EXAMPLES
+Run parsers of digest lists in /etc/ima/digest_lists.
+
+# upload_digest_lists add /etc/ima/digest_lists
+
+
+AUTHOR
+Written by Roberto Sassu, <roberto.sassu at huawei.com>.
+
+
+COPYING
+Copyright (C) 2020 Huawei Technologies Duesseldorf GmbH. Free use of
+this software is granted under the terms of the GNU Public License 2.0
+(GPLv2).

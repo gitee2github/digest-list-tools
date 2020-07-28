@@ -1,0 +1,114 @@
+NAME
+gen_digest_lists - generate a digest list
+
+
+SYNOPSIS
+gen_digest_lists [options]
+
+
+DESCRIPTION
+gen_digest_lists can be used to generate digest lists with one of the
+available generators (e.g. rpm, ima).
+
+
+OPTIONS
+-d <directory>: directory containing digest lists
+
+-f <format>: format of the input file, syntax: <generator ID>+<generator func>
+
+-i <path>: path of the input file
+
+-o <operation>: operation to do:
+		- add: insert a new digest list at the position specified
+		- append: add a new digest list after the existing ones
+		- remove: remove a digest list at the position specified
+		- sign: sign a digest list
+
+-p <position>: position of the file in the directory to add/remove
+
+-t <compact id>: type of compact list to generate
+
+-T: generate a TLV compact list
+
+-m <modifiers>: compact list modifiers separated by comma
+
+-a <algorithm>: digest list hash algorithm
+
+-I <algo>: IMA hash algorithm
+
+-s: sign generated digest lists
+
+-k <key>: key to sign
+
+-w [<key password>]: key password (- for prompt)
+
+-A <alt root>: alternative root for SELinux labeling
+
+-h: display help
+
+
+Generator specific options can be specified in the command line with the format
+-i <option arg>:<option value>
+
+compact/unknown:
+i: : include file digest in the digest list if digest list type is metadata
+I: : file or directory to include in the digest list
+L:<path> : take the list of files to include in the digest list from a file
+G:<path> : generate a list of file to include in the digest list instead of the
+           digest list itself
+l:<|policy> : include SELinux label in the calculation of the EVM digest;
+              specify policy to force retrieving the label from the policy
+              instead of security.selinux
+e: : select only files with execute bit set
+u: : take the file name of the new digest list from the L: option
+r: : use zero as UID/GID values
+F: : force inclusion of files without execute bit set even if e: option is
+     specified
+x: : set security.ima
+
+rpm:
+i: : include file digest in the digest list if digest list type is metadata
+
+F: : force inclusion of files without execute bit set even if e: option is
+     specified
+l:<|policy> : include SELinux label in the calculation of the EVM digest;
+              specify policy to force retrieving the label from the policy
+              instead of security.selinux
+e: : select only files with execute bit set
+x: : set security.ima
+f:<compact|compact_tlv> : convert to compact format (non-TLV or TLV) instead
+                          of writing the RPM header to the new file
+p:<package> : create a digest list from RPM database, only from packages
+              whose name starts with 'package'
+
+unknown:
+D:<path> : preload existing digest lists in memory so that only unknown files
+           (content or metadata, depending on the digest list type) are included
+           in the digest list
+
+
+EXAMPLES
+Generate a compact digest list for each installed RPM package and copy it to
+/etc/ima/digest_lists.
+
+# gen_digest_lists -f rpm+db -t file -o append
+
+Generate an RPM digest list from an RPM package and copy it to
+/etc/ima/digest_lists.
+
+# gen_digest_lists -f rpm+pkg -i <RPM path> -t file -o append
+
+Generate a compact digest list of immutable files from the IMA measurement
+list.
+
+# gen_digest_lists -f ima+ima_ng -t file_immutable -o append
+
+
+AUTHOR
+Written by Roberto Sassu, <roberto.sassu at huawei.com>.
+
+
+COPYING
+Copyright (C) 2017-2020 Huawei Technologies Duesseldorf GmbH. Free use of
+this software is granted under the terms of the GNU Public License 2.0
+(GPLv2).

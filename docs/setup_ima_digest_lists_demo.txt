@@ -1,0 +1,47 @@
+NAME
+setup_ima_digest_lists_demo - demo script to generate digest lists
+
+
+SYNOPSIS
+setup_ima_digest_lists_demo initial|final
+                            [private key (PEM)] [x.509 certificate (PEM)]
+
+
+DESCRIPTION
+setup_ima_digest_lists_demo is a demo script that simplifies the generation
+of digest lists.
+
+
+COMMANDS
+initial: generate digest lists from the RPM database and from files in the
+         filesystem
+
+final: complete configuration
+
+
+OPTIONS
+<private key>: path of private key in PEM format
+
+<x509 certificate>: path of X.509 certificate in PEM format
+
+-h: display help
+
+
+EXAMPLES
+Generate digest lists from the RPM database and from files in the filesystem.
+
+# setup_ima_digest_lists initial privkey.pem cert.pem
+
+Complete configuration.
+
+# setup_ima_digest_lists final
+
+
+AUTHOR
+Written by Roberto Sassu, <roberto.sassu at huawei.com>.
+
+
+COPYING
+Copyright (C) 2017-2020 Huawei Technologies Duesseldorf GmbH. Free use of
+this software is granted under the terms of the GNU Public License 2.0
+(GPLv2).

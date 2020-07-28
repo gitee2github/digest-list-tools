@@ -1,0 +1,278 @@
+#! /bin/bash
+
+# Copyright (C) 2017-2020 Huawei Technologies Duesseldorf GmbH
+#
+# Author: Roberto Sassu <roberto.sassu@huawei.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation, version 2 of the
+# License.
+#
+# File: setup_ima_digest_lists
+#      Configure digest lists.
+
+
+OPTIND=2
+digest_lists_dir="/etc/ima/digest_lists"
+parser_path="/usr/bin/manage_digest_lists"
+gen_digest_lists_result=0
+use_current_ima_list=0
+sign_opt=""
+sign_opts=""
+kernel_ver=$(uname -r)
+freeze_mutable=0
+unfreeze_mutable=0
+search_dirs=""
+exclude_dirs=""
+new_list=""
+selected_lists=""
+mutable_op=""
+gen_initramfs=0
+metadata_opt=""
+signed_lists=""
+generator="compact"
+include_lsm_label_opt=""
+tlv_opt=""
+executable_opt=""
+no_default_type=0
+
+function detect_dracut_metadata_opt() {
+    result=$(dracut --help | grep file-metadata)
+
+    if [ -n "$result" ]; then
+        metadata_opt="-e xattr"
+    fi
+}
+
+function detect_mkinitramfs_metadata_opt() {
+    result=$(mkinitramfs 2> /dev/stdout |grep metadata)
+
+    if [ -n "$result" ]; then
+        metadata_opt="-e xattr"
+    fi
+}
+
+function question() {
+    echo "${1}? [y/N]"
+    read answer
+
+    if [ "$answer" != "y" ]; then
+        echo "Exiting."
+        exit 0
+    fi
+}
+
+function usage() {
+    echo "Usage: $0 parser|distro|immutable|mutable [options]"
+    echo "Options:"
+    echo -e "\t-d <directory>: directory where digest lists are stored"
+    echo -e "\t-i: add files not found in existing digest lists"
+    echo -e "\t-t <type>: specify type of compact list"
+    echo -e "\t-V <kernel version>: kernel version"
+    echo -e "\t-D <search dirs>: directories containing immutable/mutable files"
+    echo -e "\t-E <exclude dirs>: excluded directories"
+    echo -e "\t-g: generate digest lists of mutable files"
+    echo -e "\t-a: run initramfs generator"
+    echo -e "\t-s: sign digest list"
+    echo -e "\t-v <private key>: path of private key in PEM format"
+    echo -e "\t-x <x509 certificate>: path of X.509 certificate in PEM format"
+    echo -e "\t-l: include LSM label"
+    echo -e "\t-h: display help"
+}
+
+if [ "$1" != "parser" ] && [ "$1" != "distro" ] && [ "$1" != "immutable" ] && \
+   [ "$1" != "mutable" ]; then
+    usage
+    exit 1
+fi
+
+if [ -e "/etc/os-release" ]; then
+    source /etc/os-release
+fi
+
+while getopts "d:it:V:D:eE:gasv:x:lh" opt; do
+    case "$opt" in
+    d)  digest_lists_dir=$OPTARG
+        ;;
+    i)  generator="unknown"
+        ;;
+    t)  compact_type=$OPTARG
+        ;;
+    V)  kernel_ver=$OPTARG
+        ;;
+    D)  for o in $(echo $OPTARG); do
+            gen_digest_lists_opt="$gen_digest_lists_opt -i I:$o"
+        done
+        ;;
+    e)  executable_opt="-i e:"
+        ;;
+    E)  for o in $OPTARG; do
+            gen_digest_lists_opt="$gen_digest_lists_opt -i E:$o"
+        done
+        ;;
+    g)  mutable_op="generate"
+        ;;
+    a)  gen_initramfs=1
+        ;;
+    s)  sign_opt="-s"
+        ;;
+    v)  private_key=$OPTARG
+        ;;
+    x)  cert=$OPTARG
+        ;;
+    l)  include_lsm_label_opt="-i l:"
+	;;
+    h)
+        usage
+        exit 0
+        ;;
+    esac
+done
+
+if [ -z "$compact_type" ]; then
+    no_default_type=1
+fi
+
+if [ "$compact_type" = "metadata" ]; then
+    tlv_opt="-T"
+fi
+
+if [ -n "$sign_opt" ]; then
+    if [ -z "$private_key" ] || [ -z "$cert" ]; then
+        echo "Private/public key not specified"
+        exit 1
+    fi
+
+    sign_opts="$sign_opt -k $private_key"
+fi
+
+if [ "$1" = "mutable" ] && [ -z "$mutable_op" ] && [ -z "$sign_opt" ]; then
+    if [ -e /.digestlist_state ]; then
+        mutable_op=$(cat /.digestlist_state)
+    fi
+fi
+
+if [ "$1" != "mutable" ] && [ -n "$mutable_op" ]; then
+    echo "Mutable options cannot be used with $1 command"
+    exit 1
+fi
+
+if [ ! -e "$digest_lists_dir" ]; then
+    mkdir -p $digest_lists_dir
+fi
+
+if [ $no_default_type -eq 1 ]; then
+    compact_type="parser"
+fi
+
+if [ "$1" = "parser" ] || \
+   [ ! -e $digest_lists_dir/compact-manage_digest_lists ]; then
+    if [ -n "$sign_opts" ]; then
+        temp_cert="/tmp/$(basename ${cert%%.pem}.der)"
+        openssl x509 -in $cert -out $temp_cert -outform der 2> /dev/null
+        if [ $? -ne 0 ]; then
+            temp_cert=$cert
+        fi
+
+        if [ ! -e /etc/keys/x509_ima.der ]; then
+            mkdir -p /etc/keys
+            cp $temp_cert /etc/keys/x509_ima.der
+        else
+            key_digest=$(sha256sum $temp_cert | awk '{print $1}')
+            ima_key_digest=$(sha256sum /etc/keys/x509_ima.der |
+                             awk '{print $1}')
+            if [ "$key_digest" != "$ima_key_digest" ]; then
+                echo "Warning: IMA key already exists"
+            fi
+        fi
+
+        if [ "$temp_cert" != "$cert" ]; then
+            rm $temp_cert
+        fi
+    fi
+
+    input_opt="-i I:${parser_path}$(ldd $parser_path | awk '{ if ($2 == "=>")
+        shlib_list=shlib_list" -i I:" $3; if ($1 ~ /^\//)
+        shlib_list=shlib_list" -i I:" $1 } END { print shlib_list }')"
+    gen_digest_lists -d $digest_lists_dir -f compact -t $compact_type \
+                     $tlv_opt $include_lsm_label_opt -o append $input_opt \
+		     $sign_opts -m immutable
+
+    libdir=$(dirname $(ldconfig -p | awk '{ if ($(NF-1) == "=>")
+        lib=$NF; if (lib != "") exit } END { print lib }'))
+    for lib in $(ls $libdir/digestlist/libparser-*.so); do
+        gen_digest_lists -d $digest_lists_dir -f compact -t $compact_type \
+                         $tlv_opt $include_lsm_label_opt -o append -i I:$lib \
+			 $sign_opts -m immutable
+    done
+fi
+
+if [ $no_default_type -eq 1 ]; then
+    compact_type="file"
+fi
+
+if [ "$1" = "distro" ]; then
+    echo "Generate digest list from package manager database"
+    if [ "$ID" == "debian" ] || [ "$ID" == "ubuntu" ]; then
+        echo "Debian-based distributions are currently not supported"
+        exit 1
+    fi
+
+    gen_digest_lists -d $digest_lists_dir -f rpm+db -t $compact_type -o append \
+                     $sign_opts
+    gen_digest_lists_result=$?
+elif [ "$1" = "immutable" ]; then
+    new_list="$(mktemp)"
+    modifiersopt="-m immutable"
+elif [ "$1" = "mutable" ]; then
+    if [ "$mutable_op" = "generate" ]; then
+        new_list="$(mktemp)"
+    elif [ -n "$sign_opts" ]; then
+        for file in $(verify_digest_lists | \
+                      awk '{ if ($3 == "process") print $4 }'); do
+            gen_digest_lists -o sign $sign_opts -i $file
+            signed_lists="$signed_lists $file"
+        done
+    else
+        echo "Please specify one of -g, -s options with mutable command"
+        exit 1
+    fi
+fi
+
+if [ -n "$new_list" ]; then
+    path_list="$(mktemp)"
+
+    gen_digest_lists -d $digest_lists_dir -f $generator -i D:$digest_lists_dir \
+                     $gen_digest_lists_opt -i G:$path_list -o append \
+                     -t $compact_type $tlv_opt $modifiersopt $executable_opt $include_lsm_label_opt $sign_opts
+    gen_digest_lists_result=$?
+
+    if [ $gen_digest_lists_result -ne 0 ]; then
+        exit 1
+    fi
+
+    vi $path_list
+
+    gen_digest_lists -d $digest_lists_dir -f $generator -i D:$digest_lists_dir \
+                     -i L:$path_list -o append -t $compact_type $tlv_opt \
+                     $modifiersopt $include_lsm_label_opt $executable_opt $sign_opts
+    gen_digest_lists_result=$?
+
+    rm -f $path_list
+fi
+
+if [ $gen_digest_lists_result -eq 0 ] && \
+   { [ -n "$new_list" ] || [ "$1" = "distro" ] || [ -n "$signed_lists" ]; } && \
+   [ $gen_initramfs -eq 1 ]; then
+    echo "Update initial ram disk"
+    if [ -f /usr/sbin/mkinitramfs ]; then
+        detect_mkinitramfs_metadata_opt
+        mkinitramfs -o /boot/initrd.img-$kernel_ver $kernel_ver $metadata_opt
+    elif [ -f /usr/bin/dracut ]; then
+        detect_dracut_metadata_opt
+        dracut -f --kver $kernel_ver $metadata_opt
+    else
+        echo "Cannot update initial ram disk"
+    fi
+fi
