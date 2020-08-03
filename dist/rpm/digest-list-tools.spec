@@ -9,7 +9,7 @@ License:        GPL-2.0
 Url:            https://gitee.com/openeuler/digest-list-tools
 
 BuildRequires:  autoconf automake libcurl-devel libtool rpm-devel dracut gzip
-BuildRequires:  libcap-devel libcmocka-devel
+BuildRequires:  libcap-devel libcmocka-devel libselinux-devel
 
 %if 0%{?suse_version}
 BuildRequires:  libopenssl-devel glibc-devel-static
@@ -35,6 +35,8 @@ make check
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/ima/digest_lists
+mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/ima/digest_lists.tlv
+mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/ima/digest_lists.sig
 mkdir -p ${RPM_BUILD_ROOT}%{_mandir}/man1
 
 %post
@@ -52,6 +54,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/dracut.conf.d/digestlist.conf
 %dir %{_sysconfdir}/ima
 %dir %{_sysconfdir}/ima/digest_lists
+%dir %{_sysconfdir}/ima/digest_lists.tlv
+%dir %{_sysconfdir}/ima/digest_lists.sig
 %{_bindir}/gen_digest_lists
 %{_bindir}/setup_ima_digest_lists
 %{_bindir}/setup_ima_digest_lists_demo
@@ -60,7 +64,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/upload_digest_lists
 %{_bindir}/verify_digest_lists
 %{_bindir}/write_rpm_pgp_sig
-%{_libexecdir}/rpm_parser
+%dir %{_prefix}/libexec
+%{_prefix}/libexec/rpm_parser
 %{_libdir}/libdigestlist-base.so
 %dir %{_libdir}/digestlist
 %{_libdir}/digestlist/libgenerator-compact.so
