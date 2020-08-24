@@ -70,7 +70,7 @@ static int add_file(int dirfd, char *filename, Header *hdr, u16 type,
     struct list_struct *list = NULL, *list_file = NULL;
     struct stat s;
 
-    fd = openat(dirfd, filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    fd = openat(dirfd, filename, O_WRONLY | O_CREAT | O_TRUNC, DIGEST_LIST_MODE);
     if (fd < 0)
         return -EACCES;
 
@@ -342,7 +342,7 @@ static int gen_rpm_digest_list(Header rpm, int dirfd, char *filename,
     ssize_t ret;
     int fd;
 
-    fd = openat(dirfd, filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    fd = openat(dirfd, filename, O_WRONLY | O_CREAT | O_TRUNC, DIGEST_LIST_MODE);
     if (fd < 0)
         return -EACCES;
 
@@ -384,7 +384,7 @@ static int write_rpm_header_signature(Header rpm, int dirfd, char *filename)
     write_ima_xattr(dirfd, filename, issuer, sizeof(uint32_t), sig, sig_len,
             pgp_algo_mapping[algo]);
 
-    fd = openat(dirfd, filename, O_WRONLY | O_APPEND, 0644);
+    fd = openat(dirfd, filename, O_WRONLY | O_APPEND, DIGEST_LIST_MODE);
     if (fd < 0) {
         ret = -EACCES;
         goto out;

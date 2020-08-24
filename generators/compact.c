@@ -368,9 +368,9 @@ int generator(int dirfd, int pos, struct list_head *head_in,
     }
 
     if (!gen_list_path)
-        fd = openat(dirfd, filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        fd = openat(dirfd, filename, O_WRONLY | O_CREAT | O_TRUNC, DIGEST_LIST_MODE);
     else
-        fd = openat(-1, gen_list_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        fd = openat(-1, gen_list_path, O_WRONLY | O_CREAT | O_TRUNC, DIGEST_LIST_MODE);
     if (fd < 0) {
         printf("Cannot open %s\n", filename);
         ret = -EACCES;

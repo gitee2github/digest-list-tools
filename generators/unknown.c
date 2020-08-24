@@ -373,9 +373,9 @@ int generator(int dirfd, int pos, struct list_head *head_in,
             tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min,
             tm.tm_sec);
 
-        fd = openat(dirfd, filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        fd = openat(dirfd, filename, O_WRONLY | O_CREAT | O_TRUNC, DIGEST_LIST_MODE);
     } else {
-        fd = openat(-1, gen_list_path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        fd = openat(-1, gen_list_path, O_WRONLY | O_CREAT | O_TRUNC, DIGEST_LIST_MODE);
     }
 
     if (fd < 0) {

@@ -37,7 +37,6 @@
 #include "selinux.h"
 
 #define DIGEST_LIST_LABEL "system_u:object_r:etc_t:s0"
-#define DIGEST_LIST_MODE 0644
 #define DIGEST_LIST_ALGO HASH_ALGO_SHA256
 
 char *compact_types_str[COMPACT__LAST] = {

@@ -130,7 +130,7 @@ static void test_compact_tlv_parser(void **state)
     assert_return_code(dirfd, 0);
 
     snprintf(path, sizeof(path), "I:%s", NEW_FILE);
-    fd = open(&path[2], O_WRONLY | O_CREAT, 0644);
+    fd = open(&path[2], O_WRONLY | O_CREAT, DIGEST_LIST_MODE);
     assert_return_code(fd, 0);
 
     ret = write(fd, "0", 1);
@@ -170,7 +170,7 @@ static void test_compact_tlv_parser(void **state)
     assert_non_null(parser_lib);
 
     fd_compact_list = openat(dirfd, NEW_COMPACT_LIST,
-                 O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                 O_WRONLY | O_CREAT | O_TRUNC, DIGEST_LIST_MODE);
     assert_return_code(fd_compact_list, 0);
 
     ret = ((parser_func)parser_lib->func)(fd_compact_list, &list_head,
@@ -196,7 +196,7 @@ static void test_compact_tlv_parser(void **state)
     munmap(buf, size);
 
     fd_compact_list = openat(dirfd, NEW_COMPACT_LIST,
-                 O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                 O_WRONLY | O_CREAT | O_TRUNC, DIGEST_LIST_MODE);
     assert_return_code(fd_compact_list, 0);
 
     ret = ((parser_func)parser_lib->func)(fd_compact_list, &list_head,

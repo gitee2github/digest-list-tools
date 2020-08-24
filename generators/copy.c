@@ -51,7 +51,7 @@ int generator(int dirfd, int pos, struct list_head *head_in,
         if (ret < 0)
             goto out;
 
-        fd = openat(dirfd, filename, O_WRONLY | O_CREAT, 0644);
+        fd = openat(dirfd, filename, O_WRONLY | O_CREAT, DIGEST_LIST_MODE);
         if (fd < 0) {
             munmap(buf, size);
             ret = fd;

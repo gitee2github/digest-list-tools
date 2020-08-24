@@ -26,6 +26,7 @@
 #include <sys/xattr.h>
 
 #include "lib.h"
+#include "compact_list.h"
 
 static const char *file_attrs_str[ATTR__LAST] = {
     [ATTR_PATH] = "path",
@@ -130,7 +131,7 @@ int copy_file(char *src, char *dest)
     if (ret < 0)
         return ret;
 
-    fd = open(dest, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    fd = open(dest, O_WRONLY | O_CREAT | O_TRUNC, DIGEST_LIST_MODE);
     if (fd < 0)
         goto out;
 
