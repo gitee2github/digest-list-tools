@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
             fd = init_digest_list_upload(&mount_sysfs,
                              &mount_securityfs);
         else
-            fd = open(output, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            fd = open(output, O_WRONLY | O_CREAT | O_TRUNC, DIGEST_LIST_MODE);
 
         if (fd < 0) {
             ret = -EACCES;

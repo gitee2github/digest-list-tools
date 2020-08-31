@@ -19,6 +19,7 @@
 
 #define COMPACT_LIST_SIZE_MAX 64 * 1024 * 1024 - 1
 #define IMA_KEY_PATH "/etc/keys/x509_ima.der"
+#define DIGEST_LIST_MODE 0644
 
 enum parser_ops { PARSER_OP_ADD_DIGEST, PARSER_OP_ADD_DIGEST_TO_HTABLE,
           PARSER_OP_ADD_META_DIGEST,

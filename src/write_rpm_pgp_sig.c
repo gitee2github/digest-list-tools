@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     write_ima_xattr(-1, argv[1], issuer, sizeof(uint32_t), sig, sig_len,
             pgp_algo_mapping[algo]);
 
-    fd = openat(-1, argv[1], O_WRONLY | O_APPEND, 0644);
+    fd = openat(-1, argv[1], O_WRONLY | O_APPEND, DIGEST_LIST_MODE);
     if (fd < 0) {
         ret = -EACCES;
         goto out;

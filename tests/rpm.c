@@ -152,7 +152,7 @@ static void test_rpm_parser(void **state)
     assert_non_null(lib);
 
     fd_compact_list = openat(dirfd, NEW_COMPACT_LIST, O_WRONLY | O_CREAT,
-                 0644);
+                 DIGEST_LIST_MODE);
     assert_return_code(fd_compact_list, 0);
 
     ret = read_file_from_path(dirfd, RPM_HEADER, &buf, &size);
