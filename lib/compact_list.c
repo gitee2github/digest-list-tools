@@ -786,8 +786,15 @@ int process_lists(int dirfd, int fd, int save, int verbose,
             ret = gen_write_ima_xattr(xattr, &xattr_len, path,
                           DIGEST_LIST_ALGO, digest,
                           true, true);
-            if (ret < 0)
+            if (ret < 0) {
                 printf("Cannot set IMA xattr to %s\n", path);
+                break;
+            }
+
+            ret = lsetxattr(path, "user.digest_list", "1", 1, 0);
+            if (ret < 0)
+                printf("Cannot add user.digest_list to %s\n",
+                       path);
 
             break;
         default:
