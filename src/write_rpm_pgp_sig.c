@@ -17,6 +17,7 @@
 
 #include "pgp.h"
 #include "xattr.h"
+#include "compact_list.h"
 
 int main(int argc, char *argv[])
 {
