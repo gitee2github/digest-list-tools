@@ -19,10 +19,10 @@ OPTIONS
 -i <path>: path of the input file
 
 -o <operation>: operation to do:
-          - add: insert a new digest list at the position specified
-          - append: add a new digest list after the existing ones
-          - remove: remove a digest list at the position specified
-          - sign: sign a digest list
+		- add: insert a new digest list at the position specified
+		- append: add a new digest list after the existing ones
+		- remove: remove a digest list at the position specified
+		- sign: sign a digest list
 
 -p <position>: position of the file in the directory to add/remove
 

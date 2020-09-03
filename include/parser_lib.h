@@ -18,19 +18,19 @@
 #include "compact_list.h"
 
 int add_digest(int fd, struct list_head *head, u16 type, u16 modifiers,
-           u16 algo, u8 *digest);
+	       u16 algo, u8 *digest);
 int calc_metadata_digest(int fd, struct list_head *head, u16 type,
-             u16 modifiers, u16 algo, u8 *digest, u8 *evm_digest,
-             char *path, uid_t uid, gid_t gid, mode_t mode,
-             char *obj_label, char *caps);
+			 u16 modifiers, u16 algo, u8 *digest, u8 *evm_digest,
+			 char *path, uid_t uid, gid_t gid, mode_t mode,
+			 char *obj_label, char *caps);
 int add_metadata_digest(int fd, struct list_head *head, u16 modifiers,
-            u8 *evm_digest);
+			u8 *evm_digest);
 int add_ima_xattr(int fd, struct list_head *head, u16 type, u16 modifiers,
-          u16 algo, u8 *digest, char *path);
+		  u16 algo, u8 *digest, char *path);
 int check_repair_xattr(char *path, char *xattr_name, void *xattr_value,
-               int xattr_value_len, int ima_algo, int modifiers,
-               int repair);
+		       int xattr_value_len, int ima_algo, int modifiers,
+		       int repair);
 int check_repair_attr(char *path, uid_t uid, gid_t gid, mode_t mode,
-              int repair);
+		      int repair);
 
 #endif /*_PARSER_LIB_H*/

@@ -17,6 +17,6 @@
 
 int ima_copy_boot_aggregate(int fd);
 int ima_generate_entry(int dirfd, int fd, char *digest_list_dir,
-               char *digest_list_filename);
+		       char *digest_list_filename);
 
 #endif /*_IMA_LIST_H*/
