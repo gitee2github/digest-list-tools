@@ -37,6 +37,7 @@ static const char *file_attrs_str[ATTR__LAST] = {
 	[ATTR_UNAME] = "uname",
 	[ATTR_GNAME] = "gname",
 	[ATTR_CAPS] = "caps",
+	[ATTR_OBJ_LABEL] = "obj_label",
 };
 
 enum hash_algo pgp_algo_mapping[PGP_HASH__LAST] = {

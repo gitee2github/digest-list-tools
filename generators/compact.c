@@ -39,7 +39,7 @@ static int add_file(int dirfd, int fd, char *path, u16 type, u16 modifiers,
 		    enum hash_algo ima_algo, bool tlv, bool gen_list,
 		    bool include_lsm_label, bool root_cred, bool set_ima_xattr,
 		    bool set_evm_xattr, char *alt_root, char *caps,
-		    char *file_digest)
+		    char *file_digest, char *label)
 {
 	cap_t c;
 	u8 ima_xattr[2048];
@@ -111,25 +111,36 @@ static int add_file(int dirfd, int fd, char *path, u16 type, u16 modifiers,
 				return ret;
 		}
 
-		if (include_lsm_label == 1)
-			obj_label_len = getxattr(path, XATTR_NAME_SELINUX,
-						 NULL, 0);
-		if (obj_label_len > 0) {
-			obj_label = malloc(obj_label_len);
+		if (label) {
+			obj_label = strdup(label);
 			if (!obj_label)
 				return -ENOMEM;
 
-			obj_label_len = getxattr(path, XATTR_NAME_SELINUX,
-						 obj_label, obj_label_len);
-			if (obj_label_len <= 0) {
-				ret = -EACCES;
-				goto out;
-			}
-		} else {
-			obj_label_len = 0;
+			obj_label_len = strlen(obj_label) + 1;
 		}
 
-		if (include_lsm_label == 2) {
+		if (!obj_label && include_lsm_label == 1) {
+			obj_label_len = getxattr(path, XATTR_NAME_SELINUX,
+						 NULL, 0);
+			if (obj_label_len > 0) {
+				obj_label = malloc(obj_label_len);
+				if (!obj_label)
+					return -ENOMEM;
+
+				obj_label_len = getxattr(path,
+							 XATTR_NAME_SELINUX,
+							 obj_label,
+							 obj_label_len);
+				if (obj_label_len <= 0) {
+					ret = -EACCES;
+					goto out;
+				}
+			} else {
+				obj_label_len = 0;
+			}
+		}
+
+		if (!obj_label && include_lsm_label == 2) {
 			ret = get_selinux_label(path, alt_root, &obj_label,
 						st->st_mode);
 			if (!ret && obj_label)
@@ -496,7 +507,8 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 					       include_lsm_label, root_cred,
 					       set_ima_xattr, set_evm_xattr,
 					       alt_root, cur->attrs[ATTR_CAPS],
-					       cur->attrs[ATTR_DIGEST]);
+					       cur->attrs[ATTR_DIGEST],
+					       cur->attrs[ATTR_OBJ_LABEL]);
 				if (!ret)
 					unlink = false;
 				if (ret < 0 && ret != -ENOENT &&
