@@ -1,3 +1,10 @@
+2020-09-03  Roberto Sassu <roberto.sassu@huawei.com>
+	version 0.3.94
+	* Add obj_label attribute in file list
+	* Replace hard coded permission
+	* Set user.digest_list xattr
+	* Bug fixes
+
 2020-07-14  Roberto Sassu <roberto.sassu@huawei.com>
 	version 0.3.93
 	* Add support for PGP signatures

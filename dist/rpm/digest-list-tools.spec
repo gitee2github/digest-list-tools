@@ -1,5 +1,5 @@
 name:           digest-list-tools
-Version:        0.3.93
+Version:        0.3.94
 Release:        1
 Summary:        Digest list tools
 
@@ -7,6 +7,7 @@ Source0:        %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 License:        GPL-2.0
 Url:            https://gitee.com/openeuler/digest-list-tools
+
 BuildRequires:  autoconf automake libcurl-devel libtool rpm-devel dracut gzip
 BuildRequires:  libcap-devel libcmocka-devel
 
@@ -99,7 +100,19 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{name}.1.gz
 
 %changelog
-* Tue Jul 14 2020 Roberto Sassu <roberto.sassu@huawei.com> - 0.3.93
+* Thu Sep 03 2020 Roberto Sassu <roberto.sassu@huawei.com> - 0.3.94-1
+- Add obj_label attribute in file list
+- Replace hard coded permission
+- Set user.digest_list xattr
+- Bug fixes
+
+* Tue Sep 1 2020 Anakin Zhang <benjamin93@163.com> - 0.3.93-3
+- set user.digest_list in repair-meta-digest-lists
+
+* Mon Aug 31 2020 Anakin Zhang <benjamin93@163.com> - 0.3.93-2
+- remove README file
+
+* Tue Jul 14 2020 Roberto Sassu <roberto.sassu@huawei.com> - 0.3.93-1
 - Add support for PGP signatures
 - Add support for user space parsers
 - Bug fixes
