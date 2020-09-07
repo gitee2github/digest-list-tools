@@ -19,9 +19,9 @@
 #include "compact_list.h"
 
 int evm_calc_hmac_or_hash(enum hash_algo algo, u8 *digest,
-              int lsm_label_len, char *lsm_label,
-              int ima_digest_len, u8 *ima_digest,
-              int caps_bin_len, u8 *caps_bin,
-              uid_t uid, gid_t gid, mode_t mode);
+			  int lsm_label_len, char *lsm_label,
+			  int ima_digest_len, u8 *ima_digest,
+			  int caps_bin_len, u8 *caps_bin,
+			  uid_t uid, gid_t gid, mode_t mode);
 
 #endif /*_EVM_H*/

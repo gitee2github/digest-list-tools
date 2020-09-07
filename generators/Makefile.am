@@ -1,7 +1,7 @@
 digestlistdir=$(libdir)/digestlist
 
 digestlist_LTLIBRARIES=libgenerator-copy.la libgenerator-compact.la \
-               libgenerator-unknown.la
+		       libgenerator-unknown.la
 
 libgenerator_LDFLAGS=-no-undefined -avoid-version -L$(top_srcdir)/lib/.libs
 libgenerator_LIBADD=$(top_srcdir)/lib/libdigestlist-base.la
@@ -32,10 +32,10 @@ libgenerator_unknown_la_SOURCES=unknown.c
 
 if CMOCKA
 check_LTLIBRARIES=libgenerator-copy-test.la libgenerator-compact-test.la \
-          libgenerator-unknown-test.la
+		  libgenerator-unknown-test.la
 
 libgenerator_test_LDFLAGS=-no-undefined -avoid-version \
-              -L$(top_srcdir)/lib/.libs -rpath /dev/null
+			  -L$(top_srcdir)/lib/.libs -rpath /dev/null
 libgenerator_test_LIBADD=$(top_srcdir)/lib/libdigestlist-base-test.la -lcmocka
 libgenerator_test_CFLAGS=-I$(top_srcdir)/include -DUNIT_TESTING
 

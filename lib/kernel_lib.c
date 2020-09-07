@@ -21,45 +21,45 @@
 
 /* from crypto/hash_info.c */
 const char *const hash_algo_name[HASH_ALGO__LAST] = {
-    [HASH_ALGO_MD4]         = "md4",
-    [HASH_ALGO_MD5]         = "md5",
-    [HASH_ALGO_SHA1]        = "sha1",
-    [HASH_ALGO_RIPE_MD_160] = "rmd160",
-    [HASH_ALGO_SHA256]      = "sha256",
-    [HASH_ALGO_SHA384]      = "sha384",
-    [HASH_ALGO_SHA512]      = "sha512",
-    [HASH_ALGO_SHA224]      = "sha224",
-    [HASH_ALGO_RIPE_MD_128] = "rmd128",
-    [HASH_ALGO_RIPE_MD_256] = "rmd256",
-    [HASH_ALGO_RIPE_MD_320] = "rmd320",
-    [HASH_ALGO_WP_256]      = "wp256",
-    [HASH_ALGO_WP_384]      = "wp384",
-    [HASH_ALGO_WP_512]      = "wp512",
-    [HASH_ALGO_TGR_128]     = "tgr128",
-    [HASH_ALGO_TGR_160]     = "tgr160",
-    [HASH_ALGO_TGR_192]     = "tgr192",
-    [HASH_ALGO_SM3_256]     = "sm3-256",
+	[HASH_ALGO_MD4]         = "md4",
+	[HASH_ALGO_MD5]         = "md5",
+	[HASH_ALGO_SHA1]        = "sha1",
+	[HASH_ALGO_RIPE_MD_160] = "rmd160",
+	[HASH_ALGO_SHA256]      = "sha256",
+	[HASH_ALGO_SHA384]      = "sha384",
+	[HASH_ALGO_SHA512]      = "sha512",
+	[HASH_ALGO_SHA224]      = "sha224",
+	[HASH_ALGO_RIPE_MD_128] = "rmd128",
+	[HASH_ALGO_RIPE_MD_256] = "rmd256",
+	[HASH_ALGO_RIPE_MD_320] = "rmd320",
+	[HASH_ALGO_WP_256]      = "wp256",
+	[HASH_ALGO_WP_384]      = "wp384",
+	[HASH_ALGO_WP_512]      = "wp512",
+	[HASH_ALGO_TGR_128]     = "tgr128",
+	[HASH_ALGO_TGR_160]     = "tgr160",
+	[HASH_ALGO_TGR_192]     = "tgr192",
+	[HASH_ALGO_SM3_256]     = "sm3-256",
 };
 
 const int hash_digest_size[HASH_ALGO__LAST] = {
-    [HASH_ALGO_MD4]         = MD5_DIGEST_SIZE,
-    [HASH_ALGO_MD5]         = MD5_DIGEST_SIZE,
-    [HASH_ALGO_SHA1]        = SHA1_DIGEST_SIZE,
-    [HASH_ALGO_RIPE_MD_160] = RMD160_DIGEST_SIZE,
-    [HASH_ALGO_SHA256]      = SHA256_DIGEST_SIZE,
-    [HASH_ALGO_SHA384]      = SHA384_DIGEST_SIZE,
-    [HASH_ALGO_SHA512]      = SHA512_DIGEST_SIZE,
-    [HASH_ALGO_SHA224]      = SHA224_DIGEST_SIZE,
-    [HASH_ALGO_RIPE_MD_128] = RMD128_DIGEST_SIZE,
-    [HASH_ALGO_RIPE_MD_256] = RMD256_DIGEST_SIZE,
-    [HASH_ALGO_RIPE_MD_320] = RMD320_DIGEST_SIZE,
-    [HASH_ALGO_WP_256]      = WP256_DIGEST_SIZE,
-    [HASH_ALGO_WP_384]      = WP384_DIGEST_SIZE,
-    [HASH_ALGO_WP_512]      = WP512_DIGEST_SIZE,
-    [HASH_ALGO_TGR_128]     = TGR128_DIGEST_SIZE,
-    [HASH_ALGO_TGR_160]     = TGR160_DIGEST_SIZE,
-    [HASH_ALGO_TGR_192]     = TGR192_DIGEST_SIZE,
-    [HASH_ALGO_SM3_256]     = SM3256_DIGEST_SIZE,
+	[HASH_ALGO_MD4]         = MD5_DIGEST_SIZE,
+	[HASH_ALGO_MD5]         = MD5_DIGEST_SIZE,
+	[HASH_ALGO_SHA1]        = SHA1_DIGEST_SIZE,
+	[HASH_ALGO_RIPE_MD_160] = RMD160_DIGEST_SIZE,
+	[HASH_ALGO_SHA256]      = SHA256_DIGEST_SIZE,
+	[HASH_ALGO_SHA384]      = SHA384_DIGEST_SIZE,
+	[HASH_ALGO_SHA512]      = SHA512_DIGEST_SIZE,
+	[HASH_ALGO_SHA224]      = SHA224_DIGEST_SIZE,
+	[HASH_ALGO_RIPE_MD_128] = RMD128_DIGEST_SIZE,
+	[HASH_ALGO_RIPE_MD_256] = RMD256_DIGEST_SIZE,
+	[HASH_ALGO_RIPE_MD_320] = RMD320_DIGEST_SIZE,
+	[HASH_ALGO_WP_256]      = WP256_DIGEST_SIZE,
+	[HASH_ALGO_WP_384]      = WP384_DIGEST_SIZE,
+	[HASH_ALGO_WP_512]      = WP512_DIGEST_SIZE,
+	[HASH_ALGO_TGR_128]     = TGR128_DIGEST_SIZE,
+	[HASH_ALGO_TGR_160]     = TGR160_DIGEST_SIZE,
+	[HASH_ALGO_TGR_192]     = TGR192_DIGEST_SIZE,
+	[HASH_ALGO_SM3_256]     = SM3256_DIGEST_SIZE,
 };
 
 /* from lib/hexdump.c */
@@ -73,12 +73,12 @@ const int hash_digest_size[HASH_ALGO__LAST] = {
  */
 int hex_to_bin(char ch)
 {
-    if ((ch >= '0') && (ch <= '9'))
-        return ch - '0';
-    ch = tolower(ch);
-    if ((ch >= 'a') && (ch <= 'f'))
-        return ch - 'a' + 10;
-    return -1;
+	if ((ch >= '0') && (ch <= '9'))
+		return ch - '0';
+	ch = tolower(ch);
+	if ((ch >= 'a') && (ch <= 'f'))
+		return ch - 'a' + 10;
+	return -1;
 }
 
 /**
@@ -91,16 +91,16 @@ int hex_to_bin(char ch)
  */
 int hex2bin(u8 *dst, const char *src, size_t count)
 {
-    while (count--) {
-        int hi = hex_to_bin(*src++);
-        int lo = hex_to_bin(*src++);
+	while (count--) {
+		int hi = hex_to_bin(*src++);
+		int lo = hex_to_bin(*src++);
 
-        if ((hi < 0) || (lo < 0))
-            return -1;
+		if ((hi < 0) || (lo < 0))
+			return -1;
 
-        *dst++ = (hi << 4) | lo;
-    }
-    return 0;
+		*dst++ = (hi << 4) | lo;
+	}
+	return 0;
 }
 
 #ifdef __BIG_ENDIAN__
@@ -112,12 +112,12 @@ bool ima_canonical_fmt = false;
 int default_func(u8 *digest, enum hash_algo algo, enum compact_types type,
                  u16 modifiers)
 {
-    return 0;
+	return 0;
 }
 
 struct ima_h_table ima_digests_htable = {
-    .len = 0,
-    .queue[0 ... IMA_MEASURE_HTABLE_SIZE - 1] = HLIST_HEAD_INIT
+	.len = 0,
+	.queue[0 ... IMA_MEASURE_HTABLE_SIZE - 1] = HLIST_HEAD_INIT
 };
 
 /*********************
@@ -125,116 +125,116 @@ struct ima_h_table ima_digests_htable = {
  *********************/
 struct ima_digest *ima_lookup_digest(u8 *digest, enum hash_algo algo)
 {
-    struct ima_digest *d = NULL;
-    int digest_len = hash_digest_size[algo];
-    unsigned int key = ima_hash_key(digest);
+	struct ima_digest *d = NULL;
+	int digest_len = hash_digest_size[algo];
+	unsigned int key = ima_hash_key(digest);
 
-    rcu_read_lock();
-    hlist_for_each_entry_rcu(d, &ima_digests_htable.queue[key], hnext)
-        if (d->algo == algo && !memcmp(d->digest, digest, digest_len))
-            break;
+	rcu_read_lock();
+	hlist_for_each_entry_rcu(d, &ima_digests_htable.queue[key], hnext)
+		if (d->algo == algo && !memcmp(d->digest, digest, digest_len))
+			break;
 
-    rcu_read_unlock();
-    return d;
+	rcu_read_unlock();
+	return d;
 }
 
 int ima_add_digest_data_entry_kernel(u8 *digest, enum hash_algo algo,
-                     enum compact_types type, u16 modifiers)
+				     enum compact_types type, u16 modifiers)
 {
-    struct ima_digest *d;
-    int digest_len = hash_digest_size[algo];
-    unsigned int key = ima_hash_key(digest);
+	struct ima_digest *d;
+	int digest_len = hash_digest_size[algo];
+	unsigned int key = ima_hash_key(digest);
 
-    d = ima_lookup_digest(digest, algo);
-    if (d) {
-        d->modifiers |= modifiers;
-        return -EEXIST;
-    }
+	d = ima_lookup_digest(digest, algo);
+	if (d) {
+		d->modifiers |= modifiers;
+		return -EEXIST;
+	}
 
-    d = kmalloc(sizeof(*d) + digest_len, GFP_KERNEL);
-    if (d == NULL)
-        return -ENOMEM;
+	d = kmalloc(sizeof(*d) + digest_len, GFP_KERNEL);
+	if (d == NULL)
+		return -ENOMEM;
 
-    d->algo = algo;
-    d->type = type;
-    d->modifiers = modifiers;
+	d->algo = algo;
+	d->type = type;
+	d->modifiers = modifiers;
 
-    memcpy(d->digest, digest, digest_len);
-    hlist_add_head_rcu(&d->hnext, &ima_digests_htable.queue[key]);
-    atomic_long_inc(&ima_digests_htable.len);
-    return 0;
+	memcpy(d->digest, digest, digest_len);
+	hlist_add_head_rcu(&d->hnext, &ima_digests_htable.queue[key]);
+	atomic_long_inc(&ima_digests_htable.len);
+	return 0;
 }
 
 /* from ima_digest_list.c */
 int ima_parse_compact_list(loff_t size, void *buf,
-               add_digest_func ima_add_digest_data_entry,
-               enum hash_algo *algo)
+			   add_digest_func ima_add_digest_data_entry,
+			   enum hash_algo *algo)
 {
-    u8 *digest;
-    void *bufp = buf, *bufendp = buf + size;
-    struct compact_list_hdr hdr, *hdrp;
-    size_t digest_len;
-    int ret, i;
+	u8 *digest;
+	void *bufp = buf, *bufendp = buf + size;
+	struct compact_list_hdr hdr, *hdrp;
+	size_t digest_len;
+	int ret, i;
 
-    while (bufp < bufendp) {
-        if (bufp + sizeof(hdr) > bufendp) {
-            pr_err("compact list, invalid data\n");
-            return -EINVAL;
-        }
+	while (bufp < bufendp) {
+		if (bufp + sizeof(hdr) > bufendp) {
+			pr_err("compact list, invalid data\n");
+			return -EINVAL;
+		}
 
-        hdrp = bufp;
-        memcpy(&hdr, hdrp, sizeof(hdr));
+		hdrp = bufp;
+		memcpy(&hdr, hdrp, sizeof(hdr));
 
-        if (hdr.version != 1) {
-            pr_err("compact list, unsupported version\n");
-            return -EINVAL;
-        }
+		if (hdr.version != 1) {
+			pr_err("compact list, unsupported version\n");
+			return -EINVAL;
+		}
 
-        if (ima_canonical_fmt) {
-            hdr.type = le16_to_cpu(hdr.type);
-            hdr.modifiers = le16_to_cpu(hdr.modifiers);
-            hdr.algo = le16_to_cpu(hdr.algo);
-            hdr.count = le32_to_cpu(hdr.count);
-            hdr.datalen = le32_to_cpu(hdr.datalen);
-        }
+		if (ima_canonical_fmt) {
+			hdr.type = le16_to_cpu(hdr.type);
+			hdr.modifiers = le16_to_cpu(hdr.modifiers);
+			hdr.algo = le16_to_cpu(hdr.algo);
+			hdr.count = le32_to_cpu(hdr.count);
+			hdr.datalen = le32_to_cpu(hdr.datalen);
+		}
 
-        if (hdr.algo >= HASH_ALGO__LAST)
-            return -EINVAL;
+		if (hdr.algo >= HASH_ALGO__LAST)
+			return -EINVAL;
 
-        if (algo)
-            *algo = hdr.algo;
+		if (algo)
+			*algo = hdr.algo;
 
-        digest_len = hash_digest_size[hdr.algo];
+		digest_len = hash_digest_size[hdr.algo];
 
-        if (hdr.type >= COMPACT__LAST) {
-            pr_err("compact list, invalid type %d\n", hdr.type);
-            return -EINVAL;
-        }
+		if (hdr.type >= COMPACT__LAST) {
+			pr_err("compact list, invalid type %d\n", hdr.type);
+			return -EINVAL;
+		}
 
-        bufp += sizeof(hdr);
+		bufp += sizeof(hdr);
 
-        for (i = 0; i < hdr.count; i++) {
-            if (bufp + digest_len > bufendp) {
-                pr_err("compact list, invalid data\n");
-                return -EINVAL;
-            }
+		for (i = 0; i < hdr.count; i++) {
+			if (bufp + digest_len > bufendp) {
+				pr_err("compact list, invalid data\n");
+				return -EINVAL;
+			}
 
-            digest = bufp;
-            bufp += digest_len;
+			digest = bufp;
+			bufp += digest_len;
 
-            ret = ima_add_digest_data_entry(digest, hdr.algo,
-                            hdr.type,
-                            hdr.modifiers);
-            if (ret < 0 && ret != -EEXIST)
-                return ret;
-        }
+			ret = ima_add_digest_data_entry(digest, hdr.algo,
+							hdr.type,
+							hdr.modifiers);
+			if (ret < 0 && ret != -EEXIST)
+				return ret;
+		}
 
-        if (i != hdr.count ||
-            bufp != (void *)hdrp + sizeof(hdr) + hdr.datalen) {
-            pr_err("compact list, invalid data\n");
-            return -EINVAL;
-        }
-    }
+		if (i != hdr.count ||
+		    bufp != (void *)hdrp + sizeof(hdr) + hdr.datalen) {
+			pr_err("compact list, invalid data\n");
+			return -EINVAL;
+		}
+	}
 
-    return bufp - buf;
+	return bufp - buf;
 }

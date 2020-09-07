@@ -48,7 +48,7 @@ typedef unsigned long atomic_long_t;
 
 static inline void atomic_long_inc(atomic_long_t *x)
 {
-    (*x)++;
+	(*x)++;
 }
 
 #define true 1
@@ -114,25 +114,25 @@ static inline void pr_debug(const char *__restrict __format, ...)
 #define SM3256_DIGEST_SIZE 32
 
 enum hash_algo {
-    HASH_ALGO_MD4,
-    HASH_ALGO_MD5,
-    HASH_ALGO_SHA1,
-    HASH_ALGO_RIPE_MD_160,
-    HASH_ALGO_SHA256,
-    HASH_ALGO_SHA384,
-    HASH_ALGO_SHA512,
-    HASH_ALGO_SHA224,
-    HASH_ALGO_RIPE_MD_128,
-    HASH_ALGO_RIPE_MD_256,
-    HASH_ALGO_RIPE_MD_320,
-    HASH_ALGO_WP_256,
-    HASH_ALGO_WP_384,
-    HASH_ALGO_WP_512,
-    HASH_ALGO_TGR_128,
-    HASH_ALGO_TGR_160,
-    HASH_ALGO_TGR_192,
-    HASH_ALGO_SM3_256,
-    HASH_ALGO__LAST
+	HASH_ALGO_MD4,
+	HASH_ALGO_MD5,
+	HASH_ALGO_SHA1,
+	HASH_ALGO_RIPE_MD_160,
+	HASH_ALGO_SHA256,
+	HASH_ALGO_SHA384,
+	HASH_ALGO_SHA512,
+	HASH_ALGO_SHA224,
+	HASH_ALGO_RIPE_MD_128,
+	HASH_ALGO_RIPE_MD_256,
+	HASH_ALGO_RIPE_MD_320,
+	HASH_ALGO_WP_256,
+	HASH_ALGO_WP_384,
+	HASH_ALGO_WP_512,
+	HASH_ALGO_TGR_128,
+	HASH_ALGO_TGR_160,
+	HASH_ALGO_TGR_192,
+	HASH_ALGO_SM3_256,
+	HASH_ALGO__LAST
 };
 
 /* from crypto/hash_info.c */
@@ -158,7 +158,7 @@ extern const int hash_digest_size[HASH_ALGO__LAST];
 #endif
 static inline u32 __hash_32_generic(u32 val)
 {
-    return val * GOLDEN_RATIO_32;
+	return val * GOLDEN_RATIO_32;
 }
 
 #ifndef HAVE_ARCH_HASH_32
@@ -166,8 +166,8 @@ static inline u32 __hash_32_generic(u32 val)
 #endif
 static inline u32 hash_32_generic(u32 val, unsigned int bits)
 {
-    /* High bits are more random, so use them. */
-    return __hash_32(val) >> (32 - bits);
+	/* High bits are more random, so use them. */
+	return __hash_32(val) >> (32 - bits);
 }
 
 #ifndef HAVE_ARCH_HASH_64
@@ -176,28 +176,28 @@ static inline u32 hash_32_generic(u32 val, unsigned int bits)
 static __always_inline u32 hash_64_generic(u64 val, unsigned int bits)
 {
 #if BITS_PER_LONG == 64
-    /* 64x64-bit multiply is efficient on all 64-bit processors */
-    return val * GOLDEN_RATIO_64 >> (64 - bits);
+	/* 64x64-bit multiply is efficient on all 64-bit processors */
+	return val * GOLDEN_RATIO_64 >> (64 - bits);
 #else
-    /* Hash 64 bits using only 32x32-bit multiply. */
-    return hash_32((u32)val ^ __hash_32(val >> 32), bits);
+	/* Hash 64 bits using only 32x32-bit multiply. */
+	return hash_32((u32)val ^ __hash_32(val >> 32), bits);
 #endif
 }
 
 static inline u32 hash_ptr(const void *ptr, unsigned int bits)
 {
-    return hash_long((unsigned long)ptr, bits);
+	return hash_long((unsigned long)ptr, bits);
 }
 
 /* This really should be called fold32_ptr; it does no hashing to speak of. */
 static inline u32 hash32_ptr(const void *ptr)
 {
-    unsigned long val = (unsigned long)ptr;
+	unsigned long val = (unsigned long)ptr;
 
 #if __BITS_PER_LONG == 64
-    val ^= (val >> 32);
+	val ^= (val >> 32);
 #endif
-    return (u32)val;
+	return (u32)val;
 }
 
 /* from kernel.h */
@@ -215,83 +215,83 @@ extern bool ima_canonical_fmt;
 
 static inline unsigned long ima_hash_key(u8 *digest)
 {
-    return hash_long(*digest, IMA_HASH_BITS);
+	return hash_long(*digest, IMA_HASH_BITS);
 }
 
 struct ima_h_table {
-    atomic_long_t len;	/* number of stored measurements in the list */
-    atomic_long_t violations;
-    struct hlist_head queue[IMA_MEASURE_HTABLE_SIZE];
+	atomic_long_t len;	/* number of stored measurements in the list */
+	atomic_long_t violations;
+	struct hlist_head queue[IMA_MEASURE_HTABLE_SIZE];
 };
 
 /* from integrity.h */
 enum evm_ima_xattr_type {
-    IMA_XATTR_DIGEST = 0x01,
-    EVM_XATTR_HMAC,
-    EVM_IMA_XATTR_DIGSIG,
-    IMA_XATTR_DIGEST_NG,
-    EVM_XATTR_PORTABLE_DIGSIG,
-    EVM_IMA_XATTR_DIGEST_LIST,
-    IMA_XATTR_LAST
+	IMA_XATTR_DIGEST = 0x01,
+	EVM_XATTR_HMAC,
+	EVM_IMA_XATTR_DIGSIG,
+	IMA_XATTR_DIGEST_NG,
+	EVM_XATTR_PORTABLE_DIGSIG,
+	EVM_IMA_XATTR_DIGEST_LIST,
+	IMA_XATTR_LAST
 };
 
 enum evm_ima_sig_fmt {
-    SIG_FMT_IMA,
-    SIG_FMT_PGP,
-    SIG_FMT__LAST,
+	SIG_FMT_IMA,
+	SIG_FMT_PGP,
+	SIG_FMT__LAST,
 };
 
 struct signature_v2_hdr {
-    uint8_t type;		/* xattr type */
-    uint8_t version;	/* signature format version */
-    uint8_t	hash_algo;	/* Digest algorithm [enum hash_algo] */
-    __be32 keyid;		/* IMA key identifier - not X509/PGP specific */
-    __be16 sig_size;	/* signature size */
-    uint8_t sig[0];		/* signature payload */
+	uint8_t type;		/* xattr type */
+	uint8_t version;	/* signature format version */
+	uint8_t	hash_algo;	/* Digest algorithm [enum hash_algo] */
+	__be32 keyid;		/* IMA key identifier - not X509/PGP specific */
+	__be16 sig_size;	/* signature size */
+	uint8_t sig[0];		/* signature payload */
 } __attribute__((packed));
 
 struct evm_ima_xattr_data {
-    uint8_t type;
-    uint8_t digest[SHA512_DIGEST_SIZE + 1];
+	uint8_t type;
+	uint8_t digest[SHA512_DIGEST_SIZE + 1];
 } __attribute__((packed));
 
 /* from integrity.h */
 enum compact_types { COMPACT_KEY, COMPACT_PARSER, COMPACT_FILE,
-             COMPACT_METADATA, COMPACT__LAST };
+		     COMPACT_METADATA, COMPACT__LAST };
 enum compact_modifiers { COMPACT_MOD_IMMUTABLE, COMPACT_MOD__LAST };
 
 struct ima_digest {
-    struct hlist_node hnext;
-    struct list_head list;
-    enum hash_algo algo;
-    enum compact_types type;
-    u16 modifiers;
-    u8 digest[0];
+	struct hlist_node hnext;
+	struct list_head list;
+	enum hash_algo algo;
+	enum compact_types type;
+	u16 modifiers;
+	u8 digest[0];
 };
 
 /* from ima_digest_list.c */
 struct compact_list_hdr {
-    u8 version;
-    u8 _reserved;
-    u16 type;
-    u16 modifiers;
-    u16 algo;
-    u32 count;
-    u32 datalen;
+	u8 version;
+	u8 _reserved;
+	u16 type;
+	u16 modifiers;
+	u16 algo;
+	u32 count;
+	u32 datalen;
 } __attribute__((packed));
 
 typedef int (*add_digest_func)(u8 *digest, enum hash_algo algo,
-                   enum compact_types type, u16 modifiers);
+			       enum compact_types type, u16 modifiers);
 
 int default_func(u8 *digest, enum hash_algo algo, enum compact_types type,
                  u16 modifiers);
 
 int ima_parse_compact_list(loff_t size, void *buf,
-               add_digest_func ima_add_digest_data_entry,
-               enum hash_algo *algo);
+			   add_digest_func ima_add_digest_data_entry,
+			   enum hash_algo *algo);
 
 struct ima_digest *ima_lookup_digest(u8 *digest, enum hash_algo algo);
 int ima_add_digest_data_entry_kernel(u8 *digest, enum hash_algo algo,
-                     enum compact_types type, u16 modifiers);
+				     enum compact_types type, u16 modifiers);
 
 #endif /* _KERNEL_LIB_H */
