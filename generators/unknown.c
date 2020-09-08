@@ -35,12 +35,12 @@
 #define FORMAT_TLV "compact_tlv"
 
 static int add_file(int dirfd, int fd, char *path, u16 type, u16 modifiers,
-		    struct stat *st, struct list_struct *list,
-		    struct list_struct *list_file, enum hash_algo algo,
-		    enum hash_algo ima_algo, bool tlv, bool gen_list,
-		    bool include_lsm_label, bool root_cred, bool set_ima_xattr,
-		    bool set_evm_xattr, char *alt_root, char *caps,
-		    char *file_digest, char *label)
+		    struct list_head *list_head, struct stat *st,
+		    enum hash_algo algo, enum hash_algo ima_algo, bool tlv,
+		    bool gen_list, bool include_lsm_label,
+		    bool include_ima_digests, bool root_cred,
+		    bool set_ima_xattr, bool set_evm_xattr, char *alt_root,
+		    char *caps, char *file_digest, char *label)
 {
 	cap_t c;
 	struct ima_digest *found_digest;
@@ -54,6 +54,7 @@ static int add_file(int dirfd, int fd, char *path, u16 type, u16 modifiers,
 	struct stat s;
 	LIST_HEAD(items);
 	int gen_ima_xattr = 1;
+	struct list_struct *list = NULL, *list_file = NULL;
 	int ret, ima_xattr_len, obj_label_len = 0, caps_bin_len = 0;
 
 	if (!S_ISREG(st->st_mode))
@@ -69,6 +70,17 @@ static int add_file(int dirfd, int fd, char *path, u16 type, u16 modifiers,
 	if (((st->st_mode & S_IXUGO) || !(st->st_mode & S_IWUGO)) &&
 	    st->st_size)
 		modifiers |= (1 << COMPACT_MOD_IMMUTABLE);
+
+	list = compact_list_init(list_head, type, modifiers, algo, tlv);
+	if (!list)
+		return -ENOMEM;
+
+	if (type == COMPACT_METADATA && include_ima_digests) {
+		list_file = compact_list_init(list_head, COMPACT_FILE,
+					      modifiers, algo, tlv);
+		if (!list_file)
+			return -ENOMEM;
+	}
 
 	if (!file_digest) {
 		ret = calc_file_digest(digest, -1, path, algo);
@@ -209,7 +221,7 @@ static int add_file(int dirfd, int fd, char *path, u16 type, u16 modifiers,
 	}
 
 	if (!tlv) {
-		if (type == COMPACT_METADATA && list_file) {
+		if (type == COMPACT_METADATA && include_ima_digests) {
 			ret = compact_list_add_digest(fd, list_file,
 						      ima_digest);
 			if (ret < 0)
@@ -256,7 +268,6 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 	FTS *fts = NULL;
 	FTSENT *ftsent;
 	char *paths[2] = { "/", NULL };
-	struct list_struct *list = NULL, *list_file = NULL;
 	char filename[NAME_MAX + 1];
 	char path[PATH_MAX];
 	char *digest_lists_dir = NULL, *path_list = NULL, *gen_list_path = NULL;
@@ -397,17 +408,6 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 		goto out_selinux;
 	}
 
-	list = compact_list_init(&list_head, type, modifiers, algo, tlv);
-	if (!list)
-		goto out_close;
-
-	if (type == COMPACT_METADATA && include_ima_digests) {
-		list_file = compact_list_init(&list_head, COMPACT_FILE,
-					      modifiers, algo, tlv);
-		if (!list_file)
-			goto out_close;
-	}
-
 	list_for_each_entry(cur, head_in, list) {
 		if (cur->path[0] != 'I')
 			continue;
@@ -506,11 +506,12 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 					continue;
 
 				ret = add_file(dirfd, fd, ftsent->fts_path,
-					type, modifiers, statp,
-					list, list_file, algo, ima_algo, tlv,
+					type, modifiers, &list_head, statp,
+					algo, ima_algo, tlv,
 					gen_list_path != NULL,
-					include_lsm_label, root_cred,
-					set_ima_xattr, set_evm_xattr, alt_root,
+					include_lsm_label, include_ima_digests,
+					root_cred, set_ima_xattr, set_evm_xattr,
+					alt_root,
 					cur->attrs[ATTR_CAPS],
 					cur->attrs[ATTR_DIGEST],
 					cur->attrs[ATTR_OBJ_LABEL]);
