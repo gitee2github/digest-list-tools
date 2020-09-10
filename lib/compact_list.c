@@ -15,6 +15,7 @@
 #define _GNU_SOURCE
 #include <errno.h>
 #include <unistd.h>
+#include <inttypes.h>
 #include <dirent.h>
 #include <keyutils.h>
 #include <sys/mman.h>
@@ -339,7 +340,7 @@ void compact_list_tlv_dump_items(struct _tlv_item **items)
 		case ID_FSMAGIC:
 			u64_value = *(u64 *)items[i]->data;
 			u64_value = le64_to_cpu(u64_value);
-			printf("%lu", u64_value);
+			printf("%" PRIu64 "", u64_value);
 			break;
 		default:
 			break;
