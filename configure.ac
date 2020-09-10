@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([digest-list-tools], [0.3], [roberto.sassu@huawei.com])
+AC_INIT([digest-list-tools], [0.3.94], [roberto.sassu@huawei.com])
 AC_CONFIG_HEADERS([config.h])
 
 AM_INIT_AUTOMAKE([-Wall foreign subdir-objects])
