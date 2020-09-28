@@ -19,7 +19,7 @@
 #include "ima_list.h"
 
 #define TCG_EVENT_NAME_LEN_MAX 255
-#define DIGEST_LIST_PCR 16
+#define DIGEST_LIST_PCR 11
 #define IMA_SIG_TEMPLATE "ima-sig"
 #define IMA_DIGEST_ALGO HASH_ALGO_SHA256
 #define IMA_PATH "/sys/kernel/security/ima/binary_runtime_measurements"
