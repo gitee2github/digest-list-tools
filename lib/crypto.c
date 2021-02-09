@@ -21,7 +21,7 @@
 
 #include "crypto.h"
 #include "xattr.h"
-
+#include "pgp.h"
 
 int calc_digest(u8 *digest, void *data, u64 len, enum hash_algo algo)
 {
@@ -223,6 +223,35 @@ out_fp:
 	fclose(fp);
 out:
 	EVP_cleanup();
+	return new;
+}
+
+struct key_struct *new_key_pgp(struct list_head *head, int dirfd,
+			       char *key_path)
+{
+	struct key_struct *new = NULL;
+	void *data;
+	loff_t size;
+	int ret;
+
+	ret = read_file_from_path(-1, key_path, &data, &size);
+	if (ret < 0)
+		return NULL;
+
+	new = calloc(1, sizeof(*new));
+	if (!new)
+		goto out;
+
+	new->key = pgp_key_parse(data, size, new->keyid);
+	if (!new->key) {
+		free(new);
+		new = NULL;
+		goto out;
+	}
+
+	list_add_tail(&new->list, head);
+out:
+	munmap(data, size);
 	return new;
 }
 
