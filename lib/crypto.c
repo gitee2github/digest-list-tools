@@ -272,8 +272,8 @@ struct key_struct *lookup_key(struct list_head *head, int dirfd, char *key_path,
 		if (!memcmp(cur->keyid, keyid, sizeof(cur->keyid)))
 			return cur;
 
-	if (key_path)
-		return cur;
+	if (!key_path)
+		return NULL;
 
 	return new_key(head, dirfd, key_path, NULL, false);
 }
@@ -387,7 +387,8 @@ static int verify_common(struct list_head *head, int dirfd, char *filename,
 
 	k = lookup_key(head, dirfd, NULL, keyid);
 	if (!k) {
-		printf("No key found for id %d\n", be32_to_cpu(keyid));
+		printf("No key found for id %08x\n",
+		       __be32_to_cpu(*(uint32_t *)keyid));
 		ret = -ENOENT;
 		goto out;
 	}
