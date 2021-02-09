@@ -43,6 +43,7 @@ struct key_struct {
 	u8 keyid[4];
 };
 
+void free_key(struct list_head *head, struct key_struct *key);
 void free_keys(struct list_head *head);
 struct key_struct *new_key(struct list_head *head, int dirfd, char *key_path,
 			   char *keypass, bool private);

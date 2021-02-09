@@ -128,20 +128,28 @@ const struct RSA_ASN1_template RSA_ASN1_templates[HASH_ALGO__LAST] = {
 #undef _
 };
 
-static void free_key(struct key_struct *k)
+static void _free_key(struct key_struct *k)
 {
 	RSA_free(k->key);
 	free(k);
 }
 
-void free_keys(struct list_head *head)
+void free_key(struct list_head *head, struct key_struct *key)
 {
 	struct key_struct *cur, *tmp;
 
 	list_for_each_entry_safe(cur, tmp, head, list) {
+		if (key && cur != key)
+			continue;
+
 		list_del(&cur->list);
-		free_key(cur);
+		_free_key(cur);
 	}
+}
+
+void free_keys(struct list_head *head)
+{
+	return free_key(head, NULL);
 }
 
 struct key_struct *new_key(struct list_head *head, int dirfd, char *key_path,
@@ -212,7 +220,7 @@ struct key_struct *new_key(struct list_head *head, int dirfd, char *key_path,
 	free(pkey);
 out_key:
 	if (ret < 0) {
-		free_key(new);
+		_free_key(new);
 		new = NULL;
 	}
 out_fp:
