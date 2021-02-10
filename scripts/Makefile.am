@@ -1,1 +1,1 @@
-bin_SCRIPTS=setup_ima_digest_lists setup_ima_digest_lists_demo
+bin_SCRIPTS=setup_ima_digest_lists setup_ima_digest_lists_demo setup_grub2

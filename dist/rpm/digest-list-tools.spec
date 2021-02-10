@@ -55,6 +55,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/gen_digest_lists
 %{_bindir}/setup_ima_digest_lists
 %{_bindir}/setup_ima_digest_lists_demo
+%{_bindir}/setup_grub2
 %{_bindir}/manage_digest_lists
 %{_bindir}/upload_digest_lists
 %{_bindir}/verify_digest_lists
