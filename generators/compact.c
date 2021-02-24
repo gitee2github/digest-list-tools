@@ -421,11 +421,17 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 				pwd = getpwnam(cur->attrs[ATTR_UNAME]);
 			if (pwd)
 				st.st_uid = pwd->pw_uid;
+			if (cur->attrs[ATTR_UID])
+				st.st_uid = strtol(cur->attrs[ATTR_UID],
+						   NULL, 10);
 			st.st_gid = 0;
 			if (cur->attrs[ATTR_GNAME])
 				grp = getgrnam(cur->attrs[ATTR_GNAME]);
 			if (grp)
 				st.st_gid = grp->gr_gid;
+			if (cur->attrs[ATTR_GID])
+				st.st_gid = strtol(cur->attrs[ATTR_GID],
+						   NULL, 10);
 			if (cur->attrs[ATTR_DIGESTALGO])
 				list_algo = strtol(cur->attrs[ATTR_DIGESTALGO],
 						   NULL, 10);
