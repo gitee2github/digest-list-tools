@@ -220,9 +220,21 @@ static int add_file(int dirfd, char *filename, Header *hdr, u16 type,
 			s.st_gid = 0;
 			s.st_mode = mode;
 			s.st_size = size;
+		} else {
+			if (set_ima_xattr && algo != ima_algo &&
+			    getuid() == 0) {
+				ret = write_ima_xattr(-1, file_path, NULL, 0,
+						      NULL, 0, algo);
+				if (ret < 0) {
+					printf("Cannot write xattr to %s\n",
+					       file_path);
+					goto out_free_items;
+				}
+			}
 		}
 
 		if (!tlv) {
+
 			if (type == COMPACT_METADATA && include_ima_digests) {
 				ret = compact_list_add_digest(fd, list_file,
 							      ima_digest);

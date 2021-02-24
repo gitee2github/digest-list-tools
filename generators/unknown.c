@@ -256,6 +256,16 @@ out_free_items:
 out:
 	free(obj_label);
 	free(caps_bin);
+
+	if (set_ima_xattr && getxattr(path, XATTR_NAME_IMA, NULL, 0) < 0 &&
+	    algo != ima_algo && getuid() == 0) {
+		ret = write_ima_xattr(-1, path, NULL, 0, NULL, 0, algo);
+		if (ret < 0) {
+			printf("Cannot write xattr to %s\n", path);
+			goto out_free_items;
+		}
+	}
+
 	return ret;
 }
 
