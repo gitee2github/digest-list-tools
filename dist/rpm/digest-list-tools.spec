@@ -1,6 +1,6 @@
 name:           digest-list-tools
-Version:        0.3.94
-Release:        3
+Version:        0.3.95
+Release:        1
 Summary:        Utilities for IMA Digest Lists extension
 
 Source0:        https://gitee.com/openeuler/%{name}/repository/archive/v%{version}.tar.gz
@@ -105,6 +105,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{name}.1.gz
 
 %changelog
+* Tue Feb 16 2021 Roberto Sassu <roberto.sassu@huawei.com> - 0.3.95-1
+- Add support for PGP keys
+- Add setup_grub2 script
+- Bug fixes
+
 * Mon Sep 14 2020 Anakin Zhang <benjamin93@163.com> - 0.3.94-3
 - fix Source0 and Summary in spec
 
