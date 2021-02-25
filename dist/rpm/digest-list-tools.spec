@@ -1,9 +1,9 @@
 name:           digest-list-tools
 Version:        0.3.94
-Release:        1
-Summary:        Digest list tools
+Release:        3
+Summary:        Utilities for IMA Digest Lists extension
 
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://gitee.com/openeuler/%{name}/repository/archive/v%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 License:        GPL-2.0
 Url:            https://gitee.com/openeuler/digest-list-tools
@@ -64,8 +64,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/upload_digest_lists
 %{_bindir}/verify_digest_lists
 %{_bindir}/write_rpm_pgp_sig
-%dir %{_prefix}/libexec
-%{_prefix}/libexec/rpm_parser
+%{_libexecdir}/rpm_parser
 %{_libdir}/libdigestlist-base.so
 %dir %{_libdir}/digestlist
 %{_libdir}/digestlist/libgenerator-compact.so
@@ -106,6 +105,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{name}.1.gz
 
 %changelog
+* Mon Sep 14 2020 Anakin Zhang <benjamin93@163.com> - 0.3.94-3
+- fix Source0 and Summary in spec
+
+* Thu Sep 10 2020 Anakin Zhang <benjamin93@163.com> - 0.3.94-2
+- fix invalid format in i686
+
 * Thu Sep 03 2020 Roberto Sassu <roberto.sassu@huawei.com> - 0.3.94-1
 - Add obj_label attribute in file list
 - Replace hard coded permission
