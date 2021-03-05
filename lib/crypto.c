@@ -370,6 +370,11 @@ static int verify_common(struct list_head *head, int dirfd, char *filename,
 		if (ret < 0)
 			goto out;
 	} else {
+		if (!sig_in) {
+			printf("Signature not provided\n");
+			return -ENOENT;
+		}
+
 		ret = parse_ima_xattr(sig_in, sig_in_len, &keyid, &keyid_len,
 				      &sig, &sig_len, &algo);
 		if (ret) {
@@ -380,6 +385,11 @@ static int verify_common(struct list_head *head, int dirfd, char *filename,
 		if (algo != algo_in) {
 			printf("Hash algorithm mismatch\n");
 			return -EINVAL;
+		}
+
+		if (!digest_in) {
+			printf("Digest not provided\n");
+			return -ENOENT;
 		}
 
 		memcpy(digest, digest_in, hash_digest_size[algo]);
