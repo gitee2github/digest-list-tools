@@ -117,7 +117,7 @@ ssize_t write_check(int fd, const void *buf, size_t count)
 			return -EIO;
 		}
 
-		buf += ret;
+		buf = (u8 *)buf + ret;
 		count -= ret;
 	}
 
