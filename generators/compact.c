@@ -36,7 +36,7 @@
 static int add_file(int dirfd, int fd, char *path, u16 type, u16 modifiers,
 		    struct list_head *list_head, struct stat *st,
 		    enum hash_algo algo, enum hash_algo ima_algo, bool tlv,
-		    bool gen_list, bool include_lsm_label,
+		    bool gen_list, int include_lsm_label,
 		    bool include_ima_digests, bool root_cred,
 		    bool set_ima_xattr, bool set_evm_xattr, char *alt_root,
 		    char *caps, char *file_digest, char *label)
