@@ -61,9 +61,8 @@ static int add_file(int dirfd, char *filename, Header *hdr, u16 type,
 	rpmtd filedigestalgo, filedigests, filemodes, filesizes, filecaps;
 	rpmtd basenames, dirnames, dirindexes;
 	struct path_struct *cur;
-	uint16_t mode;
+	uint16_t mode, cur_modifiers;
 	uint32_t size, dirindex;
-	u16 file_modifiers;
 	cap_t c;
 	struct vfs_cap_data rawvfscap;
 	int rawvfscap_len, fd;
@@ -102,18 +101,9 @@ static int add_file(int dirfd, char *filename, Header *hdr, u16 type,
 	}
 
 	algo = pgp_algo_mapping[pgp_algo];
-	list = compact_list_init(&list_head, type, modifiers, algo, tlv);
-	if (!list)
-		goto out_close;
-
-	if (type == COMPACT_METADATA && include_ima_digests) {
-		list_file = compact_list_init(&list_head, COMPACT_FILE,
-					      modifiers, algo, tlv);
-		if (!list_file)
-			goto out_close;
-	}
 
 	while ((ima_digest_str = rpmtdNextString(filedigests))) {
+		cur_modifiers = modifiers;
 		include_file = 0;
 		ret = 0;
 
@@ -161,15 +151,25 @@ static int add_file(int dirfd, char *filename, Header *hdr, u16 type,
 		if (!include_file)
 			continue;
 
-		if (type == COMPACT_METADATA) {
-			file_modifiers = modifiers;
-			if (((mode & S_IXUGO) ||
-			    !(mode & S_IWUGO)) && size)
-			    file_modifiers |= (1 << COMPACT_MOD_IMMUTABLE);
+		if (((mode & S_IXUGO) || !(mode & S_IWUGO)) && size)
+			cur_modifiers |= (1 << COMPACT_MOD_IMMUTABLE);
 
+		list = compact_list_init(&list_head, type, cur_modifiers, algo,
+					 tlv);
+		if (!list)
+			goto out_close;
+
+		if (type == COMPACT_METADATA && include_ima_digests) {
+			list_file = compact_list_init(&list_head, COMPACT_FILE,
+						      modifiers, algo, tlv);
+			if (!list_file)
+				goto out_close;
+		}
+
+		if (type == COMPACT_METADATA) {
 			ret = gen_write_ima_xattr(ima_xattr, &ima_xattr_len,
 				file_path, algo, ima_digest,
-				(file_modifiers & (1 << COMPACT_MOD_IMMUTABLE)),
+				(modifiers & (1 << COMPACT_MOD_IMMUTABLE)),
 				set_ima_xattr);
 			if (ret < 0)
 				goto out_close;
@@ -177,7 +177,7 @@ static int add_file(int dirfd, char *filename, Header *hdr, u16 type,
 			if (set_evm_xattr) {
 				ret = write_evm_xattr(file_path, algo);
 				if (ret < 0)
-					return ret;
+					goto out_close;
 			}
 
 			if (include_lsm_label) {
@@ -220,9 +220,21 @@ static int add_file(int dirfd, char *filename, Header *hdr, u16 type,
 			s.st_gid = 0;
 			s.st_mode = mode;
 			s.st_size = size;
+		} else {
+			if (set_ima_xattr && algo != ima_algo &&
+			    getuid() == 0) {
+				ret = write_ima_xattr(-1, file_path, NULL, 0,
+						      NULL, 0, algo);
+				if (ret < 0) {
+					printf("Cannot write xattr to %s\n",
+					       file_path);
+					goto out_free_items;
+				}
+			}
 		}
 
 		if (!tlv) {
+
 			if (type == COMPACT_METADATA && include_ima_digests) {
 				ret = compact_list_add_digest(fd, list_file,
 							      ima_digest);

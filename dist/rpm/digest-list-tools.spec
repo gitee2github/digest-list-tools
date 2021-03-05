@@ -1,15 +1,15 @@
 name:           digest-list-tools
-Version:        0.3.94
+Version:        0.3.95
 Release:        1
-Summary:        Digest list tools
+Summary:        Utilities for IMA Digest Lists extension
 
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://gitee.com/openeuler/%{name}/repository/archive/v%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 License:        GPL-2.0
 Url:            https://gitee.com/openeuler/digest-list-tools
 
 BuildRequires:  autoconf automake libcurl-devel libtool rpm-devel dracut gzip
-BuildRequires:  libcap-devel libcmocka-devel
+BuildRequires:  libcap-devel libcmocka-devel libselinux-devel
 
 %if 0%{?suse_version}
 BuildRequires:  libopenssl-devel glibc-devel-static
@@ -35,6 +35,8 @@ make check
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
 mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/ima/digest_lists
+mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/ima/digest_lists.tlv
+mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/ima/digest_lists.sig
 mkdir -p ${RPM_BUILD_ROOT}%{_mandir}/man1
 
 %post
@@ -52,9 +54,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/dracut.conf.d/digestlist.conf
 %dir %{_sysconfdir}/ima
 %dir %{_sysconfdir}/ima/digest_lists
+%dir %{_sysconfdir}/ima/digest_lists.tlv
+%dir %{_sysconfdir}/ima/digest_lists.sig
 %{_bindir}/gen_digest_lists
 %{_bindir}/setup_ima_digest_lists
 %{_bindir}/setup_ima_digest_lists_demo
+%{_bindir}/setup_grub2
 %{_bindir}/manage_digest_lists
 %{_bindir}/upload_digest_lists
 %{_bindir}/verify_digest_lists
@@ -100,6 +105,17 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{name}.1.gz
 
 %changelog
+* Tue Feb 16 2021 Roberto Sassu <roberto.sassu@huawei.com> - 0.3.95-1
+- Add support for PGP keys
+- Add setup_grub2 script
+- Bug fixes
+
+* Mon Sep 14 2020 Anakin Zhang <benjamin93@163.com> - 0.3.94-3
+- fix Source0 and Summary in spec
+
+* Thu Sep 10 2020 Anakin Zhang <benjamin93@163.com> - 0.3.94-2
+- fix invalid format in i686
+
 * Thu Sep 03 2020 Roberto Sassu <roberto.sassu@huawei.com> - 0.3.94-1
 - Add obj_label attribute in file list
 - Replace hard coded permission

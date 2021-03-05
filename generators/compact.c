@@ -34,12 +34,12 @@
 #define FORMAT_TLV "compact_tlv"
 
 static int add_file(int dirfd, int fd, char *path, u16 type, u16 modifiers,
-		    struct stat *st, struct list_struct *list,
-		    struct list_struct *list_file, enum hash_algo algo,
-		    enum hash_algo ima_algo, bool tlv, bool gen_list,
-		    bool include_lsm_label, bool root_cred, bool set_ima_xattr,
-		    bool set_evm_xattr, char *alt_root, char *caps,
-		    char *file_digest, char *label)
+		    struct list_head *list_head, struct stat *st,
+		    enum hash_algo algo, enum hash_algo ima_algo, bool tlv,
+		    bool gen_list, int include_lsm_label,
+		    bool include_ima_digests, bool root_cred,
+		    bool set_ima_xattr, bool set_evm_xattr, char *alt_root,
+		    char *caps, char *file_digest, char *label)
 {
 	cap_t c;
 	u8 ima_xattr[2048];
@@ -52,6 +52,7 @@ static int add_file(int dirfd, int fd, char *path, u16 type, u16 modifiers,
 	LIST_HEAD(items);
 	struct stat s;
 	int gen_ima_xattr = 1;
+	struct list_struct *list = NULL, *list_file = NULL;
 	int ret, ima_xattr_len, obj_label_len = 0, caps_bin_len = 0;
 
 	if (!S_ISREG(st->st_mode))
@@ -75,6 +76,18 @@ static int add_file(int dirfd, int fd, char *path, u16 type, u16 modifiers,
 	if (((st->st_mode & S_IXUGO) || !(st->st_mode & S_IWUGO)) &&
 	    st->st_size)
 		modifiers |= (1 << COMPACT_MOD_IMMUTABLE);
+
+	list = compact_list_init(list_head, type, modifiers, algo, tlv);
+	if (!list)
+		return -ENOMEM;
+
+	if (type == COMPACT_METADATA && include_ima_digests) {
+		list_file = compact_list_init(list_head, COMPACT_FILE,
+					      modifiers, algo, tlv);
+		if (!list_file)
+			return -ENOMEM;
+	}
+
 
 	if (!file_digest) {
 		ret = calc_file_digest(digest, -1, path, algo);
@@ -201,7 +214,7 @@ static int add_file(int dirfd, int fd, char *path, u16 type, u16 modifiers,
 	}
 
 	if (!tlv) {
-		if (type == COMPACT_METADATA && list_file) {
+		if (type == COMPACT_METADATA && include_ima_digests) {
 			ret = compact_list_add_digest(fd, list_file,
 						      ima_digest);
 			if (ret < 0)
@@ -236,19 +249,21 @@ static int add_file(int dirfd, int fd, char *path, u16 type, u16 modifiers,
 		printf("Cannot add digest to compact list\n");
 		goto out_free_items;
 	}
+out_free_items:
+	compact_list_tlv_free_items(&items);
+out:
+	free(obj_label);
+	free(caps_bin);
 
-	if (algo != ima_algo && getuid() == 0) {
+	if (set_ima_xattr && getxattr(path, XATTR_NAME_IMA, NULL, 0) < 0 &&
+	    algo != ima_algo && getuid() == 0) {
 		ret = write_ima_xattr(-1, path, NULL, 0, NULL, 0, algo);
 		if (ret < 0) {
 			printf("Cannot write xattr to %s\n", path);
 			goto out_free_items;
 		}
 	}
-out_free_items:
-	compact_list_tlv_free_items(&items);
-out:
-	free(obj_label);
-	free(caps_bin);
+
 	return ret;
 }
 
@@ -260,7 +275,6 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 	char filename[NAME_MAX + 1], *basename = NULL, *link = NULL;
 	char path[PATH_MAX], *path_list = NULL, *data_ptr, *line_ptr;
 	char *path_ptr = NULL, *gen_list_path = NULL, *real_path;
-	struct list_struct *list = NULL, *list_file = NULL;
 	struct path_struct *cur, *cur_i, *cur_e;
 	LIST_HEAD(list_head);
 	FTS *fts = NULL;
@@ -390,17 +404,6 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 		goto out_selinux;
 	}
 
-	list = compact_list_init(&list_head, type, modifiers, algo, tlv);
-	if (!list)
-		goto out_close;
-
-	if (type == COMPACT_METADATA && include_ima_digests) {
-		list_file = compact_list_init(&list_head, COMPACT_FILE,
-					      modifiers, algo, tlv);
-		if (!list_file)
-			goto out_close;
-	}
-
 	list_for_each_entry(cur, head_in, list) {
 		if (cur->path[0] != 'I')
 			continue;
@@ -418,11 +421,17 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 				pwd = getpwnam(cur->attrs[ATTR_UNAME]);
 			if (pwd)
 				st.st_uid = pwd->pw_uid;
+			if (cur->attrs[ATTR_UID])
+				st.st_uid = strtol(cur->attrs[ATTR_UID],
+						   NULL, 10);
 			st.st_gid = 0;
 			if (cur->attrs[ATTR_GNAME])
 				grp = getgrnam(cur->attrs[ATTR_GNAME]);
 			if (grp)
 				st.st_gid = grp->gr_gid;
+			if (cur->attrs[ATTR_GID])
+				st.st_gid = strtol(cur->attrs[ATTR_GID],
+						   NULL, 10);
 			if (cur->attrs[ATTR_DIGESTALGO])
 				list_algo = strtol(cur->attrs[ATTR_DIGESTALGO],
 						   NULL, 10);
@@ -501,10 +510,11 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 					continue;
 
 				ret = add_file(dirfd, fd, ftsent->fts_path,
-					       type, modifiers, statp, list,
-					       list_file, algo, ima_algo, tlv,
+					       type, modifiers, &list_head,
+					       statp, algo, ima_algo, tlv,
 					       gen_list_path != NULL,
-					       include_lsm_label, root_cred,
+					       include_lsm_label,
+					       include_ima_digests, root_cred,
 					       set_ima_xattr, set_evm_xattr,
 					       alt_root, cur->attrs[ATTR_CAPS],
 					       cur->attrs[ATTR_DIGEST],

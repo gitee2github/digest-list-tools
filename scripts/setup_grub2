@@ -1,0 +1,56 @@
+#! /bin/bash
+
+# Copyright (C) 2021 Huawei Technologies Duesseldorf GmbH
+#
+# Author: Roberto Sassu <roberto.sassu@huawei.com>
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation, version 2 of the
+# License.
+#
+# File: setup_grub2
+#      Configure grub2 boot loader.
+
+#! /bin/bash
+
+if [ -z "$(which new-kernel-pkg)" ]; then
+	echo "new-kernel-pkg binary not found"
+	exit 1
+fi
+
+if [ $# -lt 2 ]; then
+	echo "Syntax: $0 <feature> <kernel version> [--mkinitrd]"
+	echo
+	echo "Features:"
+	echo -e "\t- measurement"
+	echo -e "\t- appraisal"
+	echo -e "\t- measurement+appraisal"
+	exit 1
+fi
+
+. /etc/os-release
+
+opts_measurement='ima_template=ima-sig ima_policy=\\\"exec_tcb\\\" initramtmpfs
+ ima_hash=sha256 ima_digest_list_pcr=11'
+opts_appraisal='ima_template=ima-sig
+ ima_policy=\\\"appraise_exec_tcb|appraise_exec_immutable\\\" initramtmpfs
+ ima_hash=sha256 ima_appraise=enforce-evm evm=x509 evm=complete
+ ima_appraise_digest_list=digest'
+opts=""
+
+if [ "$1" = "measurement" ]; then
+	opts="$opts_measurement"
+elif [ "$1" = "appraisal" ]; then
+	opts="$opts_appraisal"
+elif [ "$1" = "measurement+appraisal" ]; then
+	opts="$opts_measurement $opts_appraisal"
+else
+	echo "Unknown feature $1"
+	exit 1
+fi
+
+initrdfile=$(ls /boot/ | grep $(uname -r) | grep init | head -n 1 |
+	     sed "s/$(uname -r)/$2/")
+new-kernel-pkg $3 --initrdfile /boot/$initrdfile --kernel-args "$opts" \
+	       --install --banner "$NAME $VERSION - ${1^^}" $2

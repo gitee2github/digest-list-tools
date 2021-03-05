@@ -185,7 +185,6 @@ static void test_compact_tlv_parser(void **state)
 	free_path_structs(&head_in);
 	free_path_structs(&head_out);
 	free_libs(&generator_lib_head);
-	free_libs(&parser_lib_head);
 
 	/* parse converted list */
 	ret = read_file_from_path(dirfd, NEW_COMPACT_LIST, &buf, &size);
@@ -203,6 +202,7 @@ static void test_compact_tlv_parser(void **state)
 					      gen_list_size, gen_list_buf,
 					      PARSER_OP_ADD_META_DIGEST);
 	assert_return_code(ret, 0);
+	free_libs(&parser_lib_head);
 
 	ret = compact_list_flush_all(fd_compact_list, &list_head);
 	assert_return_code(ret, 0);

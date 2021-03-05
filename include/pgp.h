@@ -19,6 +19,7 @@
 #define _PGP_H
 
 #include <errno.h>
+#include <openssl/rsa.h>
 
 #include "kernel_lib.h"
 #include "lib.h"
@@ -195,4 +196,30 @@ struct pgp_signature_v4_packet {
 int pgp_get_signature_data(const u8 *signature, size_t signature_len,
 			   u8 **data, size_t *data_len, u8 **sig,
 			   size_t *sig_len, u8 **issuer, u16 *algo);
+
+/*
+ * Key (tag 5, 6, 7 and 14) packet
+ */
+enum pgp_key_version {
+	PGP_KEY_VERSION_2                       = 2,
+	PGP_KEY_VERSION_3                       = 3,
+	PGP_KEY_VERSION_4                       = 4,
+};
+
+struct pgp_key_v3_packet {
+	enum pgp_key_version version : 8;
+	struct pgp_time creation_time;
+	u8 expiry[2];                   /* 0 or time in days till expiry */
+	enum pgp_pubkey_algo pubkey_algo : 8;
+	u8 key_material[0];
+} __attribute__((packed));
+
+struct pgp_key_v4_packet {
+	enum pgp_key_version version : 8;
+	struct pgp_time creation_time;
+	enum pgp_pubkey_algo pubkey_algo : 8;
+	u8 key_material[0];
+} __attribute__((packed));
+
+RSA *pgp_key_parse(const u8 *data, size_t datalen, u8 *keyid);
 #endif /* _PGP_H */

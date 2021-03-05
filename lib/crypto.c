@@ -21,7 +21,7 @@
 
 #include "crypto.h"
 #include "xattr.h"
-
+#include "pgp.h"
 
 int calc_digest(u8 *digest, void *data, u64 len, enum hash_algo algo)
 {
@@ -128,20 +128,28 @@ const struct RSA_ASN1_template RSA_ASN1_templates[HASH_ALGO__LAST] = {
 #undef _
 };
 
-static void free_key(struct key_struct *k)
+static void _free_key(struct key_struct *k)
 {
 	RSA_free(k->key);
 	free(k);
 }
 
-void free_keys(struct list_head *head)
+void free_key(struct list_head *head, struct key_struct *key)
 {
 	struct key_struct *cur, *tmp;
 
 	list_for_each_entry_safe(cur, tmp, head, list) {
+		if (key && cur != key)
+			continue;
+
 		list_del(&cur->list);
-		free_key(cur);
+		_free_key(cur);
 	}
+}
+
+void free_keys(struct list_head *head)
+{
+	return free_key(head, NULL);
 }
 
 struct key_struct *new_key(struct list_head *head, int dirfd, char *key_path,
@@ -212,7 +220,7 @@ struct key_struct *new_key(struct list_head *head, int dirfd, char *key_path,
 	free(pkey);
 out_key:
 	if (ret < 0) {
-		free_key(new);
+		_free_key(new);
 		new = NULL;
 	}
 out_fp:
@@ -226,6 +234,35 @@ out:
 	return new;
 }
 
+struct key_struct *new_key_pgp(struct list_head *head, int dirfd,
+			       char *key_path)
+{
+	struct key_struct *new = NULL;
+	void *data;
+	loff_t size;
+	int ret;
+
+	ret = read_file_from_path(-1, key_path, &data, &size);
+	if (ret < 0)
+		return NULL;
+
+	new = calloc(1, sizeof(*new));
+	if (!new)
+		goto out;
+
+	new->key = pgp_key_parse(data, size, new->keyid);
+	if (!new->key) {
+		free(new);
+		new = NULL;
+		goto out;
+	}
+
+	list_add_tail(&new->list, head);
+out:
+	munmap(data, size);
+	return new;
+}
+
 struct key_struct *lookup_key(struct list_head *head, int dirfd, char *key_path,
 			      u8 *keyid)
 {
@@ -235,8 +272,8 @@ struct key_struct *lookup_key(struct list_head *head, int dirfd, char *key_path,
 		if (!memcmp(cur->keyid, keyid, sizeof(cur->keyid)))
 			return cur;
 
-	if (key_path)
-		return cur;
+	if (!key_path)
+		return NULL;
 
 	return new_key(head, dirfd, key_path, NULL, false);
 }
@@ -333,6 +370,11 @@ static int verify_common(struct list_head *head, int dirfd, char *filename,
 		if (ret < 0)
 			goto out;
 	} else {
+		if (!sig_in) {
+			printf("Signature not provided\n");
+			return -ENOENT;
+		}
+
 		ret = parse_ima_xattr(sig_in, sig_in_len, &keyid, &keyid_len,
 				      &sig, &sig_len, &algo);
 		if (ret) {
@@ -345,12 +387,18 @@ static int verify_common(struct list_head *head, int dirfd, char *filename,
 			return -EINVAL;
 		}
 
+		if (!digest_in) {
+			printf("Digest not provided\n");
+			return -ENOENT;
+		}
+
 		memcpy(digest, digest_in, hash_digest_size[algo]);
 	}
 
 	k = lookup_key(head, dirfd, NULL, keyid);
 	if (!k) {
-		printf("No key found for id %d\n", be32_to_cpu(keyid));
+		printf("No key found for id %08x\n",
+		       __be32_to_cpu(*(uint32_t *)keyid));
 		ret = -ENOENT;
 		goto out;
 	}

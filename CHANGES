@@ -1,3 +1,9 @@
+2021-02-16  Roberto Sassu <roberto.sassu@huawei.com>
+	version 0.3.95
+	* Add support for PGP keys
+	* Add setup_grub2 script
+	* Bug fixes
+
 2020-09-03  Roberto Sassu <roberto.sassu@huawei.com>
 	version 0.3.94
 	* Add obj_label attribute in file list

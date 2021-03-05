@@ -43,9 +43,12 @@ struct key_struct {
 	u8 keyid[4];
 };
 
+void free_key(struct list_head *head, struct key_struct *key);
 void free_keys(struct list_head *head);
 struct key_struct *new_key(struct list_head *head, int dirfd, char *key_path,
 			   char *keypass, bool private);
+struct key_struct *new_key_pgp(struct list_head *head, int dirfd,
+			       char *key_path);
 struct key_struct *lookup_key(struct list_head *head, int dirfd, char *key_path,
 			      u8 *keyid);
 int verify_file(struct list_head *head, int dirfd, char *filename);

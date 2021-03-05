@@ -211,6 +211,9 @@ int check_repair_xattr(char *path, char *xattr_name, void *xattr_value,
 		}
 	}
 
+	if (repair)
+		write_evm_xattr(path, ima_algo);
+
 	ret = 0;
 out:
 	free(cur_xattr_value);
