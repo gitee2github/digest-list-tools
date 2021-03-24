@@ -275,18 +275,19 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 	char filename[NAME_MAX + 1], *basename = NULL, *link = NULL;
 	char path[PATH_MAX], *path_list = NULL, *data_ptr, *line_ptr;
 	char *path_ptr = NULL, *gen_list_path = NULL, *real_path;
+	char *passwd_path = NULL, *group_path = NULL;
 	struct path_struct *cur, *cur_i, *cur_e;
 	LIST_HEAD(list_head);
 	FTS *fts = NULL;
 	FTSENT *ftsent;
 	struct stat st, *statp;
-	void *data;
+	void *data = NULL;
 	loff_t size;
 	bool unlink = true;
 	char *paths[2] = { NULL, NULL };
 	char *attrs[ATTR__LAST];
-	struct passwd *pwd;
-	struct group *grp;
+	struct passwd *pwd, pwd_struct;
+	struct group *grp, grp_struct;
 	enum hash_algo list_algo;
 	int fts_flags = (FTS_PHYSICAL | FTS_COMFOLLOW | FTS_NOCHDIR | FTS_XDEV);
 	int include_ima_digests = 0, only_executables = 0, set_ima_xattr = 0;
@@ -328,6 +329,10 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 			else
 				set_ima_xattr = 1;
 		}
+		if (cur->path[0] == 'U')
+			passwd_path = &cur->path[2];
+		if (cur->path[0] == 'g')
+			group_path = &cur->path[2];
 	}
 
 	if (path_list) {
@@ -353,7 +358,7 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 			snprintf(path, sizeof(path), "I:%s", line_ptr);
 			ret = add_path_struct(path, attrs, head_in);
 			if (ret < 0)
-				return ret;
+				goto out;
 		}
 
 		path_ptr = path_list;
@@ -389,7 +394,7 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 	if (type == COMPACT_METADATA && include_lsm_label) {
 		ret = selinux_init_setup();
 		if (ret)
-			return ret;
+			goto out;
 	}
 
 	if (!gen_list_path)
@@ -417,16 +422,28 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 				st.st_mode = strtol(cur->attrs[ATTR_MODE],
 						    NULL, 10);
 			st.st_uid = 0;
-			if (cur->attrs[ATTR_UNAME])
-				pwd = getpwnam(cur->attrs[ATTR_UNAME]);
+			if (cur->attrs[ATTR_UNAME]) {
+				if (passwd_path)
+					pwd = find_user(passwd_path,
+							cur->attrs[ATTR_UNAME],
+							&pwd_struct);
+				else
+					pwd = getpwnam(cur->attrs[ATTR_UNAME]);
+			}
 			if (pwd)
 				st.st_uid = pwd->pw_uid;
 			if (cur->attrs[ATTR_UID])
 				st.st_uid = strtol(cur->attrs[ATTR_UID],
 						   NULL, 10);
 			st.st_gid = 0;
-			if (cur->attrs[ATTR_GNAME])
-				grp = getgrnam(cur->attrs[ATTR_GNAME]);
+			if (cur->attrs[ATTR_GNAME]) {
+				if (group_path)
+					grp = find_group(group_path,
+							 cur->attrs[ATTR_GNAME],
+							 &grp_struct);
+				else
+					grp = getgrnam(cur->attrs[ATTR_GNAME]);
+			}
 			if (grp)
 				st.st_gid = grp->gr_gid;
 			if (cur->attrs[ATTR_GID])
@@ -561,6 +578,9 @@ out_close:
 out_selinux:
 	if (type == COMPACT_METADATA && include_lsm_label)
 		selinux_end_setup();
+out:
+	if (data)
+		munmap(data, size);
 
 	return ret;
 }

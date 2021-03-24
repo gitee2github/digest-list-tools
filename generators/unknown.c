@@ -280,9 +280,10 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 	char *paths[2] = { "/", NULL };
 	char filename[NAME_MAX + 1];
 	char path[PATH_MAX];
+	char *passwd_path = NULL, *group_path = NULL;
 	char *digest_lists_dir = NULL, *path_list = NULL, *gen_list_path = NULL;
 	char *data_ptr, *line_ptr, *real_path;
-	void *data;
+	void *data = NULL;
 	loff_t size;
 	time_t t = time(NULL);
 	bool unlink = true;
@@ -290,8 +291,8 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 	struct stat st, *statp;
 	LIST_HEAD(list_head);
 	char *attrs[ATTR__LAST];
-	struct passwd *pwd;
-	struct group *grp;
+	struct passwd *pwd, pwd_struct;
+	struct group *grp, grp_struct;
 	enum hash_algo list_algo;
 	int include_ima_digests = 0, only_executables = 0, root_cred = 0;
 	int include_path = 0, include_file = 0, set_ima_xattr = 0;
@@ -336,6 +337,10 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 			else
 				set_ima_xattr = 1;
 		}
+		if (cur->path[0] == 'U')
+			passwd_path = &cur->path[2];
+		if (cur->path[0] == 'g')
+			group_path = &cur->path[2];
 	}
 
 	if (!digest_lists_dir) {
@@ -366,7 +371,7 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 			snprintf(path, sizeof(path), "I:%s", line_ptr);
 			ret = add_path_struct(path, attrs, head_in);
 			if (ret < 0)
-				return ret;
+				goto out;
 		}
 	}
 
@@ -374,13 +379,14 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 	if (digest_lists_dirfd < 0) {
 		pr_err("Unable to open %s, ret: %d\n", digest_lists_dir,
 		       digest_lists_dirfd);
-		return digest_lists_dirfd;
+		ret = -EACCES;
+		goto out;
 	}
 
 	if (type == COMPACT_METADATA && include_lsm_label) {
 		ret = selinux_init_setup();
 		if (ret)
-			goto out;
+			goto out_close_digest_list;
 	}
 
 	for (i = 0; i < COMPACT__LAST; i++) {
@@ -431,16 +437,28 @@ int generator(int dirfd, int pos, struct list_head *head_in,
 				st.st_mode = strtol(cur->attrs[ATTR_MODE],
 						    NULL, 10);
 			st.st_uid = 0;
-			if (cur->attrs[ATTR_UNAME])
-				pwd = getpwnam(cur->attrs[ATTR_UNAME]);
+			if (cur->attrs[ATTR_UNAME]) {
+				if (passwd_path)
+					pwd = find_user(passwd_path,
+							cur->attrs[ATTR_UNAME],
+							&pwd_struct);
+				else
+					pwd = getpwnam(cur->attrs[ATTR_UNAME]);
+			}
 			if (pwd)
 				st.st_uid = pwd->pw_uid;
 			if (cur->attrs[ATTR_UID])
 				st.st_uid = strtol(cur->attrs[ATTR_UID],
 						   NULL, 10);
 			st.st_gid = 0;
-			if (cur->attrs[ATTR_GNAME])
-				grp = getgrnam(cur->attrs[ATTR_GNAME]);
+			if (cur->attrs[ATTR_GNAME]) {
+				if (group_path)
+					grp = find_group(group_path,
+							 cur->attrs[ATTR_GNAME],
+							 &grp_struct);
+				else
+					grp = getgrnam(cur->attrs[ATTR_GNAME]);
+			}
 			if (grp)
 				st.st_gid = grp->gr_gid;
 			if (cur->attrs[ATTR_GID])
@@ -566,7 +584,11 @@ out_close:
 out_selinux:
 	if (type == COMPACT_METADATA && include_lsm_label)
 		selinux_end_setup();
-out:
+out_close_digest_list:
 	close(digest_lists_dirfd);
+out:
+	if (data)
+		munmap(data, size);
+
 	return ret;
 }

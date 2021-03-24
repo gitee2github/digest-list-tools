@@ -15,6 +15,8 @@
 #ifndef _LIB_H
 #define _LIB_H
 
+#include <pwd.h>
+#include <grp.h>
 #include <dlfcn.h>
 #include <dirent.h>
 
@@ -77,5 +79,9 @@ int add_path_struct(char *path, char **attrs, struct list_head *head);
 void move_path_structs(struct list_head *dest, struct list_head *src);
 void free_path_structs(struct list_head *head);
 int parse_file_attrs(char *str, char **attrs);
+struct passwd *find_user(char *passwd_path, char *uname,
+			 struct passwd *pwd_struct);
+struct group *find_group(char *group_path, char *gname,
+			 struct group *grp_struct);
 
 #endif /*_LIB_H*/

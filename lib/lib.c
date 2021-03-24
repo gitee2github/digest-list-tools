@@ -336,3 +336,63 @@ int parse_file_attrs(char *str, char **attrs)
 
 	return 0;
 }
+
+struct passwd *find_user(char *passwd_path, char *uname,
+			 struct passwd *pwd_struct)
+{
+	struct passwd *pwd;
+	FILE *passwd_file;
+	struct stat st;
+	int ret = -ENOENT;
+
+	if (stat(passwd_path, &st) == -1)
+		return NULL;
+
+	if (!S_ISREG(st.st_mode))
+		return NULL;
+
+	passwd_file = fopen(passwd_path, "r");
+	if (!passwd_file)
+		return NULL;
+
+	while ((pwd = fgetpwent(passwd_file))) {
+		if (!strcmp(pwd->pw_name, uname)) {
+			memcpy(pwd_struct, pwd, sizeof(*pwd));
+			ret = 0;
+			break;
+		}
+	}
+
+	fclose(passwd_file);
+	return !ret ? pwd_struct : NULL;
+}
+
+struct group *find_group(char *group_path, char *gname,
+			 struct group *grp_struct)
+{
+	struct group *grp;
+	FILE *group_file;
+	struct stat st;
+	int ret = -ENOENT;
+
+	if (stat(group_path, &st) == -1)
+		return NULL;
+
+	if (!S_ISREG(st.st_mode))
+		return NULL;
+
+	group_file = fopen(group_path, "r");
+	if (!group_file)
+		return NULL;
+
+	while ((grp = fgetgrent(group_file))) {
+		if (!strcmp(grp->gr_name, gname)) {
+			memcpy(grp_struct, grp, sizeof(*grp));
+			ret = 0;
+			break;
+		}
+	}
+
+	fclose(group_file);
+	return !ret ? grp_struct : NULL;
+}
