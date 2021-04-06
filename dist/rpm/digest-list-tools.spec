@@ -1,11 +1,11 @@
 name:           digest-list-tools
 Version:        0.3.95
-Release:        1
+Release:        2
 Summary:        Utilities for IMA Digest Lists extension
 
 Source0:        https://gitee.com/openeuler/%{name}/repository/archive/v%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-License:        GPL-2.0
+License:        GPLv2
 Url:            https://gitee.com/openeuler/digest-list-tools
 
 BuildRequires:  autoconf automake libcurl-devel libtool rpm-devel dracut gzip
@@ -21,6 +21,16 @@ BuildRequires:  keyutils-libs-devel glibc-static
 
 %description
 This package includes the tools for configure the IMA Digest Lists extension.
+
+%package devel
+Summary:        The devel package for %{name}
+Requires:       %{name} = %{version}-%{release}
+Provides:       %{name}-static = %{version}-%{release}
+Provides:       %{name}-headers = %{version}-%{release}
+
+%description devel
+The %{name}-devel package contains the header files necessary for developing
+related programs.
 
 %prep
 %autosetup -n %{name}-%{version} -p1
@@ -78,12 +88,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_prefix}/lib/dracut/modules.d/98digestlist/module-setup.sh
 %{_prefix}/lib/dracut/modules.d/98digestlist/upload_meta_digest_lists.sh
 %{_prefix}/lib/dracut/modules.d/98digestlist/load_digest_lists.sh
+
+%files devel
+%defattr(-,root,root,-)
+%dir %{_includedir}/digestlist
+%{_includedir}/digestlist/*.h
 %exclude /usr/lib64/digestlist/*.a
 %exclude /usr/lib64/digestlist/*.la
 %exclude /usr/lib64/libdigestlist-base.a
 %exclude /usr/lib64/libdigestlist-base.la
-%dir %{_includedir}/digestlist
-%{_includedir}/digestlist/*.h
 
 %doc
 %dir /usr/share/digest-list-tools
@@ -105,6 +118,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man1/%{name}.1.gz
 
 %changelog
+* Tue Apr 6 2021 Anakin Zhang <benjamin93@163.com> - 0.3.95-2
+- add devel package for digest-list-tools
+
 * Tue Feb 16 2021 Roberto Sassu <roberto.sassu@huawei.com> - 0.3.95-1
 - Add support for PGP keys
 - Add setup_grub2 script
