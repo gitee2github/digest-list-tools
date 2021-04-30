@@ -140,7 +140,7 @@ extern const char *const hash_algo_name[HASH_ALGO__LAST];
 extern const int hash_digest_size[HASH_ALGO__LAST];
 
 /* hash */
-#if __BITB_PER_LONG == 32
+#if __BITS_PER_LONG == 32
 #define GOLDEN_RATIO_PRIME GOLDEN_RATIO_32
 #define hash_long(val, bits) hash_32(val, bits)
 #elif __BITS_PER_LONG == 64
