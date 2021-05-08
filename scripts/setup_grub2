@@ -31,20 +31,19 @@ fi
 
 . /etc/os-release
 
-opts_measurement='ima_template=ima-sig ima_policy=\\\"exec_tcb\\\" initramtmpfs
- ima_hash=sha256 ima_digest_list_pcr=11'
-opts_appraisal='ima_template=ima-sig
- ima_policy=\\\"appraise_exec_tcb|appraise_exec_immutable\\\" initramtmpfs
- ima_hash=sha256 ima_appraise=enforce-evm evm=x509 evm=complete
- ima_appraise_digest_list=digest'
+opts_common='ima_template=ima-sig initramtmpfs ima_hash=sha256 integrity=1'
+opts_measurement='ima_policy=\\\"exec_tcb\\\" ima_digest_list_pcr=11'
+opts_appraisal='ima_policy=\\\"appraise_exec_tcb|appraise_exec_immutable\\\"
+ ima_appraise=enforce-evm ima_appraise_digest_list=digest evm=x509
+ evm=complete'
 opts=""
 
 if [ "$1" = "measurement" ]; then
-	opts="$opts_measurement"
+	opts="$opts_common $opts_measurement"
 elif [ "$1" = "appraisal" ]; then
-	opts="$opts_appraisal"
+	opts="$opts_common $opts_appraisal"
 elif [ "$1" = "measurement+appraisal" ]; then
-	opts="$opts_measurement $opts_appraisal"
+	opts="$opts_common $opts_measurement $opts_appraisal"
 else
 	echo "Unknown feature $1"
 	exit 1
