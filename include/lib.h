@@ -46,7 +46,7 @@ enum pgp_hash_algo {
 	PGP_HASH__LAST
 };
 
-enum hash_algo pgp_algo_mapping[PGP_HASH__LAST];
+extern enum hash_algo pgp_algo_mapping[PGP_HASH__LAST];
 
 int read_file_from_path(int dirfd, const char *path, void **buf, loff_t *size);
 int read_write_file_from_path(int dirfd, const char *path, void **buf,
