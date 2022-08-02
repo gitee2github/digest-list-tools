@@ -132,6 +132,9 @@ int read_ima_xattr(int dirfd, char *path, u8 **buf, size_t *buf_len,
 		return -ENODATA;
 
 	*buf_len = ret;
+	if (*buf_len > 65536)
+		return -ENOMEM;
+
 	*buf = malloc(*buf_len);
 	if (!*buf)
 		return -ENOMEM;
