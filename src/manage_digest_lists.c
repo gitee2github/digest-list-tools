@@ -206,11 +206,11 @@ int main(int argc, char *argv[])
 	if (op == PARSER_OP_GEN_IMA_LIST) {
 		ret = ima_copy_boot_aggregate(fd);
 		if (ret < 0)
-			return ret;
+			goto out_close_fd;
 
 		ret = ima_generate_entry(-1, fd, "", IMA_KEY_PATH);
 		if (ret < 0)
-			return ret;
+			goto out_close_fd;
 	}
 
 	for (i = 0; i < COMPACT__LAST; i++) {

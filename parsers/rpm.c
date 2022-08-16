@@ -272,7 +272,7 @@ int parser(int fd, struct list_head *head, loff_t buf_size, void *buf,
 		}
 
 		if (ret < 0)
-			return ret;
+			goto out;
 	}
 out:
 	free(dirnames_ptr);

@@ -129,19 +129,33 @@ int read_ima_xattr(int dirfd, char *path, u8 **buf, size_t *buf_len,
 
 	ret = fgetxattr(fd, XATTR_NAME_IMA, NULL, 0);
 	if (ret < 0)
+	{
+		close(fd);
 		return -ENODATA;
+	}
 
 	*buf_len = ret;
 	if (*buf_len > 65536)
+	{
+		close(fd);
 		return -ENOMEM;
+	}
 
 	*buf = malloc(*buf_len);
 	if (!*buf)
+	{
+		close(fd);
 		return -ENOMEM;
+	}
 
 	ret = fgetxattr(fd, XATTR_NAME_IMA, *buf, ret);
 	if (ret < 0)
+	{
+		free(*buf);
+		*buf = NULL;
+		close(fd);
 		return -ENODATA;
+	}
 
 	ret = parse_ima_xattr(*buf, *buf_len, keyid, keyid_len, sig, sig_len,
 			      algo);
