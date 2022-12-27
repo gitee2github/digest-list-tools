@@ -322,6 +322,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	fts_close(fts);
 	close(fd_ima);
 	return 0;
 }
