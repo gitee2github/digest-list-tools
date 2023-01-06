@@ -314,7 +314,7 @@ static int sign_file(int dirfd, char *filename, char *key_path, char *keypass,
 	memcpy(buf + asn1->size, digest, digest_len);
 
 	sig_len = RSA_private_encrypt(digest_len + asn1->size, buf, sig, k->key,
-				      RSA_PKCS1_PADDING);
+				      RSA_PKCS1_OAEP_PADDING);
 	if (sig_len < 0) {
 		printf("RSA_private_encrypt() failed: %d\n", sig_len);
 		goto out_buf;
@@ -403,7 +403,7 @@ static int verify_common(struct list_head *head, int dirfd, char *filename,
 		goto out;
 	}
 
-	ret = RSA_public_decrypt(sig_len, sig, out, k->key, RSA_PKCS1_PADDING);
+	ret = RSA_public_decrypt(sig_len, sig, out, k->key, RSA_PKCS1_OAEP_PADDING);
 	if (ret < 0) {
 		printf("RSA_public_decrypt() failed: %d\n", ret);
 		goto out;

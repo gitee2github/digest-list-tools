@@ -164,6 +164,7 @@ static int add_file(int dirfd, int fd, char *path, u16 type, u16 modifiers,
 			if (!ret) {
 				caps_bin = malloc(caps_bin_len);
 				if (!caps_bin) {
+					cap_free(c);
 					ret = -ENOMEM;
 					goto out;
 				}
@@ -217,7 +218,7 @@ static int add_file(int dirfd, int fd, char *path, u16 type, u16 modifiers,
 		if (!ret)
 			ret = write_check(fd, "\n", 1);
 
-		return ret;
+		goto out;
 	}
 
 	if (!tlv) {

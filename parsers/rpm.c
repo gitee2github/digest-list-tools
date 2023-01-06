@@ -135,8 +135,8 @@ int parser(int fd, struct list_head *head, loff_t buf_size, void *buf,
 
 	for (i = 0; i < digests_count && digests < bufendp; i++) {
 		u16 modifiers = 0;
-		int digest_str_len = strlen(digests);
-		int basename_str_len = strlen(basenames);
+		size_t digest_str_len = strlen(digests);
+		size_t basename_str_len = strlen(basenames);
 		int filecaps_str_len = filecaps ? strlen(filecaps) : 0;
 		char *obj_label;
 		u16 mode = 0;
@@ -272,7 +272,7 @@ int parser(int fd, struct list_head *head, loff_t buf_size, void *buf,
 		}
 
 		if (ret < 0)
-			return ret;
+			goto out;
 	}
 out:
 	free(dirnames_ptr);

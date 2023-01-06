@@ -164,8 +164,8 @@ static int parse_rpm(int fd_ima, int add, char *path, struct stat *st)
 		algo = pgp_algo_mapping[be32_to_cpu(*(u32 *)algo_buf)];
 
 	for (i = 0; i < digests_count && digests < bufendp; i++) {
-		int digest_str_len = strlen(digests);
-		int basename_str_len = strlen(basenames);
+		size_t digest_str_len = strlen(digests);
+		size_t basename_str_len = strlen(basenames);
 		u32 dirindex = 0;
 
 		if ((basenames &&
